@@ -1,0 +1,15 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.mengcraft</groupId>
+    <artifactId>account</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>account-bukkit</module>
+        <module>account-bungee</module>
+        <module>account-server</module>
+    </modules>
+</project>

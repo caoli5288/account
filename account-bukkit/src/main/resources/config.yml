@@ -1,0 +1,10 @@
+broadcast:
+  interval: 100
+  content:
+  - §6请您输入/l <密码>以验证您的账户
+  - §6或者/reg <密码> <密码>以设置密码
+  bungeeSession:
+  - §6Bungee session login!
+  - §6Bungee session login!
+logEvent: true
+coreMode: false

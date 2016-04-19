@@ -1,0 +1,4 @@
+name: Account
+main: com.mengcraft.account.Main
+version: 1.0-SNAPSHOT
+author: mengcraft

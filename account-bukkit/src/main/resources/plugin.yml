@@ -1,0 +1,6 @@
+name: Account
+main: com.mengcraft.account.Main
+version: ${project.version}
+author: mengcraft.com
+
+depend: [SimpleORM]
