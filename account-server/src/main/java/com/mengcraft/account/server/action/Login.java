@@ -9,11 +9,8 @@ import com.mengcraft.account.server.entity.BeanUser;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-
-import java.util.regex.Pattern;
 
 import static com.avaje.ebean.Ebean.find;
 
@@ -24,19 +21,16 @@ import static com.avaje.ebean.Ebean.find;
 public class Login {
 
     public static final SessionMap SESSION_MAP = new SessionMap();
-    public static final Pattern PATTERN = Pattern.compile("[\\w]+");
 
     @GET
     public void process(@BeanParam LoginRequest request, @Suspended AsyncResponse response) {
-        if (!PATTERN.matcher(request.getName()).matches()) {
-            response.cancel();
-        } else ServerMain.POOL.execute(() -> {
+        ServerMain.POOL.execute(() -> {
             BeanUser user = find(BeanUser.class)
                     .where()
                     .eq("username", request.getName())
                     .findUnique();
             if (user == null) {
-                response.cancel();
+                response.resume(new LoginResponse());
             } else {
                 MD5Util util = new MD5Util();
                 try {
@@ -44,10 +38,10 @@ public class Login {
                     if (user.getPassword().equals(digest)) {
                         accept(request, response);
                     } else {
-                        response.cancel();
+                        response.resume(new LoginResponse());
                     }
                 } catch (Exception ignored) {
-                    response.cancel();
+                    response.resume(new LoginResponse());
                 }
             }
         });
@@ -56,7 +50,7 @@ public class Login {
     private void accept(LoginRequest request, AsyncResponse response) {
         String session = new SessionBuilder().nextSession();
         SESSION_MAP.put(request.getName(), session);
-        response.resume(session);
+        response.resume(new LoginResponse(session));
     }
 
 }
