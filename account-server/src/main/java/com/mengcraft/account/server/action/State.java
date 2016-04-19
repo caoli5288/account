@@ -15,7 +15,11 @@ public class State {
 
     @GET
     public StateResponse process(@PathParam("name") String name) {
-        return new StateResponse();
+        StateResponse response = new StateResponse();
+        if (Login.SESSION_MAP.containsKey(name)) {
+            response.setState(1);
+        }
+        return response;
     }
 
 }
