@@ -25,32 +25,29 @@ public class Login {
     @GET
     public void process(@BeanParam LoginRequest request, @Suspended AsyncResponse response) {
         ServerMain.POOL.execute(() -> {
+            LoginResponse response1 = new LoginResponse();
             BeanUser user = find(BeanUser.class)
                     .where()
                     .eq("username", request.getName())
                     .findUnique();
-            if (user == null) {
-                response.resume(new LoginResponse());
-            } else {
+            if (user != null) {
                 MD5Util util = new MD5Util();
                 try {
                     String digest = util.digest(request.getSecure() + user.getSalt());
                     if (user.getPassword().equals(digest)) {
-                        accept(request, response);
-                    } else {
-                        response.resume(new LoginResponse());
+                        accept(request, response1);
                     }
                 } catch (Exception ignored) {
-                    response.resume(new LoginResponse());
                 }
             }
+            response.resume(response1);
         });
     }
 
-    private void accept(LoginRequest request, AsyncResponse response) {
+    private void accept(LoginRequest request, LoginResponse response) {
         String session = new SessionBuilder().nextSession();
         SESSION_MAP.put(request.getName(), session);
-        response.resume(new LoginResponse(session));
+        response.setSession(session);
     }
 
 }

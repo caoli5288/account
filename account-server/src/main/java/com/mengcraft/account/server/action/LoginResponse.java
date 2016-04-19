@@ -7,11 +7,11 @@ public class LoginResponse {
 
     private String session;
 
-    public LoginResponse() {
+    public String getSession() {
+        return session;
     }
 
-    public LoginResponse(String session) {
+    public void setSession(String session) {
         this.session = session;
     }
-
 }

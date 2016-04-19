@@ -12,11 +12,12 @@ import javax.ws.rs.WebApplicationException;
 public class Valid {
 
     @GET
-    public String process(@PathParam("name") String name, @PathParam("session") String session) {
-        if (!(Login.SESSION_MAP.containsKey(name) && Login.SESSION_MAP.get(name).equals(session))) {
-            throw new WebApplicationException();
+    public ValidResponse process(@PathParam("name") String name, @PathParam("session") String session) {
+        ValidResponse response = new ValidResponse();
+        if (Login.SESSION_MAP.containsKey(name) && Login.SESSION_MAP.get(name).equals(session)) {
+            response.setValid(1);
         }
-        return session;
+        return response;
     }
 
 }
