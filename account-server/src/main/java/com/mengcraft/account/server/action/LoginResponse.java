@@ -6,6 +6,7 @@ package com.mengcraft.account.server.action;
 public class LoginResponse {
 
     private String session;
+    private String error;
 
     public String getSession() {
         return session;
@@ -14,4 +15,13 @@ public class LoginResponse {
     public void setSession(String session) {
         this.session = session;
     }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
 }

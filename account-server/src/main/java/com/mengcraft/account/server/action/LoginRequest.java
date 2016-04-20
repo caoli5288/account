@@ -1,8 +1,11 @@
 package com.mengcraft.account.server.action;
 
+import org.glassfish.grizzly.http.server.Request;
+
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
 
 /**
  * Created on 16-4-15.
@@ -14,6 +17,9 @@ public class LoginRequest {
 
     @PathParam("secure")
     public String secure;
+
+    @Context
+    public Request request;
 
     public String getName() {
         return name;
@@ -29,6 +35,10 @@ public class LoginRequest {
 
     public void setSecure(String secure) {
         this.secure = secure;
+    }
+
+    public String getIPAddress() {
+        return request.getRemoteAddr();
     }
 
 }

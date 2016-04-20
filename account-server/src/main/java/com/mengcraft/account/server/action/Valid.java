@@ -1,9 +1,10 @@
 package com.mengcraft.account.server.action;
 
+import com.mengcraft.account.server.TimeoutMap;
+
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
 
 /**
  * Created by on 16-4-14.
@@ -11,13 +12,26 @@ import javax.ws.rs.WebApplicationException;
 @Path("/valid/{name}/{session}")
 public class Valid {
 
+    private static final TimeoutMap QUERY_TIMEOUT = new TimeoutMap(3000);
+
     @GET
-    public ValidResponse process(@PathParam("name") String name, @PathParam("session") String session) {
+    public ValidResponse process(@BeanParam ValidRequest request) {
         ValidResponse response = new ValidResponse();
-        if (Login.SESSION_MAP.containsKey(name) && Login.SESSION_MAP.get(name).equals(session)) {
+        if (QUERY_TIMEOUT.isOnTime(request.getName())) {
+            response.setValid(2);
+        } else if (valid(request)) {
             response.setValid(1);
+        } else {
+            QUERY_TIMEOUT.put(request.getName());
         }
         return response;
+    }
+
+    private boolean valid(ValidRequest request) {
+        return (Login.SESSION_TIMEOUT.isOnTime(request.getName()) &&
+                Login.SESSION_MAP.containsKey(request.getName()) &&
+                Login.SESSION_MAP.get(request.getName()).equals(request.getSession())
+        );
     }
 
 }
