@@ -19,10 +19,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import static com.mengcraft.account.lib.CollectionUtil.convertTo;
 
@@ -31,7 +28,7 @@ import static com.mengcraft.account.lib.CollectionUtil.convertTo;
  */
 public class EventBlocker implements Listener {
 
-    private final List<UUID> locked = new ArrayList<>();
+    private final LockedList locked = LockedList.INSTANCE;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void handle(PlayerLoginEvent event) {
@@ -42,7 +39,7 @@ public class EventBlocker implements Listener {
 
     @EventHandler
     public void handle(PlayerMoveEvent event) {
-        if (isLocked(event.getPlayer().getUniqueId())) {
+        if (locked.isLocked(event.getPlayer().getUniqueId())) {
             Location from = event.getFrom();
             from.setPitch(event.getTo().getPitch());
             from.setYaw(event.getTo().getYaw());
@@ -53,35 +50,35 @@ public class EventBlocker implements Listener {
 
     @EventHandler
     public void handle(PlayerInteractEvent event) {
-        if (isLocked(event.getPlayer().getUniqueId())) {
+        if (locked.isLocked(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void handle(PlayerDropItemEvent event) {
-        if (isLocked(event.getPlayer().getUniqueId())) {
+        if (locked.isLocked(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void handle(PlayerPickupItemEvent event) {
-        if (isLocked(event.getPlayer().getUniqueId())) {
+        if (locked.isLocked(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void handle(PlayerQuitEvent event) {
-        if (isLocked(event.getPlayer().getUniqueId())) {
-            unlock(event.getPlayer().getUniqueId());
+        if (locked.isLocked(event.getPlayer().getUniqueId())) {
+            locked.remove(event.getPlayer().getUniqueId());
         }
     }
 
     @EventHandler
     public void handle(InventoryOpenEvent event) {
-        if (isLocked(event.getPlayer().getUniqueId())) {
+        if (locked.isLocked(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         }
     }
@@ -101,19 +98,19 @@ public class EventBlocker implements Listener {
     }
 
     private boolean a(Entity entity) {
-        return entity instanceof Player && isLocked(entity.getUniqueId());
+        return entity instanceof Player && locked.isLocked(entity.getUniqueId());
     }
 
     @EventHandler
     public void handle(FoodLevelChangeEvent event) {
-        if (isLocked(event.getEntity().getUniqueId())) {
+        if (locked.isLocked(event.getEntity().getUniqueId())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void handle(AsyncPlayerChatEvent event) {
-        if (isLocked(event.getPlayer().getUniqueId())) {
+        if (locked.isLocked(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         } else {
             excludeLocked(event.getRecipients());
@@ -121,22 +118,17 @@ public class EventBlocker implements Listener {
     }
 
     private void excludeLocked(Set<Player> set) {
-        set.removeAll(convertTo(set, p -> locked.contains(p.getUniqueId())));
+        set.removeAll(convertTo(set, p -> locked.isLocked(p.getUniqueId())));
     }
 
     @EventHandler
     public void handle(PlayerCommandPreprocessEvent event) {
-        if (isLocked(event.getPlayer().getUniqueId())) {
+        if (locked.isLocked(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         }
     }
 
-    public boolean isLocked(UUID uuid) {
-        return locked.contains(uuid);
+    public void bind(Main main) {
+        main.getServer().getPluginManager().registerEvents(this, main);
     }
-
-    public boolean unlock(UUID uuid) {
-        return locked.remove(uuid);
-    }
-
 }

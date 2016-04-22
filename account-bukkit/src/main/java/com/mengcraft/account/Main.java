@@ -40,7 +40,8 @@ public class Main extends JavaPlugin {
         new ExecutorCore(this).bind();
         if (!coreMode) {
             new BungeeSession(this).bind();
-            new Executor(this).bind(this);
+            new Executor(this).bind();
+            new EventBlocker().bind(this);
         }
 
         new MetricsLite(this).start();
