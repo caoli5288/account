@@ -1,4 +1,4 @@
-package com.mengcraft.account.server;
+package com.mengcraft.account.bungee.server;
 
 import java.util.concurrent.ConcurrentHashMap;
 

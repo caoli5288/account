@@ -1,4 +1,4 @@
-package com.mengcraft.account;
+package com.mengcraft.account.bungee;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;

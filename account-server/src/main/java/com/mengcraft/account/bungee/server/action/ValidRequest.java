@@ -1,4 +1,4 @@
-package com.mengcraft.account.server.action;
+package com.mengcraft.account.bungee.server.action;
 
 import org.glassfish.grizzly.http.server.Request;
 

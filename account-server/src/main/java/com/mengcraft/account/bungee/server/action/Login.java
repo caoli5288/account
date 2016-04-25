@@ -1,11 +1,11 @@
-package com.mengcraft.account.server.action;
+package com.mengcraft.account.bungee.server.action;
 
-import com.mengcraft.account.server.MD5Util;
-import com.mengcraft.account.server.ServerMain;
-import com.mengcraft.account.server.SessionBuilder;
-import com.mengcraft.account.server.SessionMap;
-import com.mengcraft.account.server.TimeoutMap;
-import com.mengcraft.account.server.entity.BeanUser;
+import com.mengcraft.account.bungee.server.Main;
+import com.mengcraft.account.bungee.server.SessionBuilder;
+import com.mengcraft.account.bungee.server.SessionMap;
+import com.mengcraft.account.bungee.server.entity.BeanUser;
+import com.mengcraft.account.bungee.server.MD5Util;
+import com.mengcraft.account.bungee.server.TimeoutMap;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
@@ -33,7 +33,7 @@ public class Login {
             response.setError("Server busy!");
         } else {
             QUERY_TIMEOUT.put(request.getIPAddress());
-            ServerMain.POOL.execute(() -> {
+            Main.POOL.execute(() -> {
                 execute(request, response);
             });
         }

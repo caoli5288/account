@@ -1,6 +1,6 @@
-package com.mengcraft.account.server.action;
+package com.mengcraft.account.bungee.server.action;
 
-import com.mengcraft.account.server.TimeoutMap;
+import com.mengcraft.account.bungee.server.TimeoutMap;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;

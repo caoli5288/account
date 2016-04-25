@@ -1,4 +1,4 @@
 name: Account
-main: com.mengcraft.account.Main
+main: Main
 version: 1.0-SNAPSHOT
 author: mengcraft

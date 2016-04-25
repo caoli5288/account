@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <parent>
         <artifactId>account</artifactId>
-        <groupId>com.mengcraft</groupId>
+        <groupId>com.mengcraft.account</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>

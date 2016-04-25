@@ -1,8 +1,8 @@
-package com.mengcraft.account.server;
+package com.mengcraft.account.bungee.server;
 
-import com.mengcraft.account.server.action.Login;
-import com.mengcraft.account.server.action.State;
-import com.mengcraft.account.server.action.Valid;
+import com.mengcraft.account.bungee.server.action.Login;
+import com.mengcraft.account.bungee.server.action.State;
+import com.mengcraft.account.bungee.server.action.Valid;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -12,14 +12,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Logger;
 
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 /**
  * Created by on 16-4-14.
  */
-public class ServerMain {
+public class Main {
 
     public static final ExecutorService POOL = newCachedThreadPool();
 
