@@ -1,6 +1,8 @@
 package com.mengcraft.account.client;
 
 import com.mengcraft.account.LockedList;
+import com.mengcraft.account.lib.Messenger;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.json.simple.JSONObject;
@@ -19,10 +21,12 @@ public class ChannelHandler implements PluginMessageListener {
 
     private final LockedList locked = LockedList.INSTANCE;
     private final Main main;
+    private final Messenger messenger;
     private String server;
 
-    public ChannelHandler(Main main) {
+    public ChannelHandler(Main main, Messenger messenger) {
         this.main = main;
+        this.messenger = messenger;
     }
 
     @Override
@@ -49,6 +53,9 @@ public class ChannelHandler implements PluginMessageListener {
                     main.execute(() -> {
                         locked.remove(p.getUniqueId());
                     }, true);
+                    messenger.send(p, "session.valid");
+                } else {
+                    messenger.send(p, "session.invalid");
                 }
             }, false);
         }
