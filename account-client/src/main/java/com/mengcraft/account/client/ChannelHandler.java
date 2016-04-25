@@ -1,9 +1,13 @@
 package com.mengcraft.account.client;
 
+import com.mengcraft.account.LockedList;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import java.io.DataInput;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -11,18 +15,42 @@ import java.net.URLConnection;
 /**
  * Created on 16-4-25.
  */
-public class ChannelHandler {
+public class ChannelHandler implements PluginMessageListener {
 
-    public final Main main;
-    public String server;
+    private final LockedList locked = LockedList.INSTANCE;
+    private final Main main;
+    private String server;
 
     public ChannelHandler(Main main) {
         this.main = main;
     }
 
+    @Override
     public void onPluginMessageReceived(String tag, Player p, byte[] data) {
         if (Main.CHANNEL.equals(tag)) {
-            // TODO
+            execute(p, ReadWriteUtil.toDataInput(data));
+        }
+    }
+
+    private void execute(Player p, DataInput input) {
+        try {
+            valid(p, input);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void valid(Player p, DataInput input) throws IOException {
+        String name = input.readUTF();
+        if (p.getName().equals(name) && locked.isLocked(p.getUniqueId())) {
+            String session = input.readUTF();
+            main.execute(() -> {
+                if (valid(name, session)) {
+                    main.execute(() -> {
+                        locked.remove(p.getUniqueId());
+                    }, true);
+                }
+            }, false);
         }
     }
 
