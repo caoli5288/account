@@ -39,7 +39,7 @@ public class Executor extends Messenger implements Listener {
     private final Map<String, User> userMap = Account.DEFAULT.getUserMap();
     private final Main main;
     private final EbeanServer db;
-    private final EventBlocker blocker = new EventBlocker();
+    private final LockedList locked = LockedList.INSTANCE;
 
     private String[] bungeeSessionMsg;
 
@@ -118,7 +118,7 @@ public class Executor extends Messenger implements Listener {
         User user = userMap.get(event.getName());
         Player p = cast(user);
         if (user.getPassword().equals(event.getSecure())) {
-            blocker.unlock(p.getUniqueId());
+            locked.remove(p.getUniqueId());
             p.sendMessage(getBungeeMessage());
         }
     }
@@ -136,14 +136,11 @@ public class Executor extends Messenger implements Listener {
         return bungeeSessionMsg;
     }
 
-    public void bind(Main main) {
+    public void bind() {
         setContents(main.getConfig().getStringList("broadcast.content"));
         getMain().getServer()
                 .getPluginManager()
                 .registerEvents(this, main);
-        getMain().getServer()
-                .getPluginManager()
-                .registerEvents(blocker, main);
         setCastInterval(main.getConfig().getInt("broadcast.interval"));
     }
 
@@ -200,7 +197,7 @@ public class Executor extends Messenger implements Listener {
         if (vector.remain() != 0) {
             User user = getUserMap().get(player.getName());
             if (user != null && user.valid() && user.valid(vector.next())) {
-                blocker.unlock(player.getUniqueId());
+                locked.remove(player.getUniqueId());
                 send(player, "login.done", ChatColor.GREEN + "登陆成功");
                 if (main.isLogEvent()) main.execute(() -> {
                     db.save(of(player, LOG_SUCCESS));
@@ -228,7 +225,7 @@ public class Executor extends Messenger implements Listener {
         main.execute(() -> {
             db.save(user);
         }, true);
-        blocker.unlock(p.getUniqueId());
+        locked.remove(p.getUniqueId());
     }
 
     private int nowSec() {
@@ -236,7 +233,7 @@ public class Executor extends Messenger implements Listener {
     }
 
     private boolean isLocked(UUID uuid) {
-        return blocker.isLocked(uuid);
+        return locked.isLocked(uuid);
     }
 
     private void setContents(List<String> list) {
