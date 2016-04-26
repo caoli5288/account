@@ -222,6 +222,7 @@ public class Executor extends Messenger implements Listener {
         user.setUsername(p.getName());
         user.setRegip(p.getAddress().getAddress().getHostAddress());
         user.setRegdate(nowSec());
+        user.setSecques("");
         main.execute(() -> {
             db.save(user);
         }, true);
