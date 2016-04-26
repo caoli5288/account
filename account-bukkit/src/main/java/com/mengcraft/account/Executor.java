@@ -117,7 +117,7 @@ public class Executor extends Messenger implements Listener {
     public void handle(UserSecureFetchedEvent event) {
         User user = userMap.get(event.getName());
         Player p = cast(user);
-        if (user.getPassword().equals(event.getSecure())) {
+        if (isLocked(p.getUniqueId()) && user.getPassword().equals(event.getSecure())) {
             locked.remove(p.getUniqueId());
             p.sendMessage(getBungeeMessage());
         }
