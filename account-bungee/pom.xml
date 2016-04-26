@@ -9,27 +9,10 @@
     <artifactId>account-bungee</artifactId>
     <version>1.0</version>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <repositories>
         <repository>
             <id>repo.md-5.net</id>
             <url>http://repo.md-5.net/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>ci-mengcraft</id>
-            <url>http://ci.mengcraft.com:8080/plugin/repository/everything/</url>
         </repository>
     </repositories>
 
