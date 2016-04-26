@@ -23,8 +23,14 @@ public class User {
     @Column(length = 32)
     private String password;
 
-    @Column(length = 6)
-    private String salt;
+    @Column(length = 32)
+    private String email;
+
+    @Column(length = 30)
+    private String myid;
+
+    @Column(length = 16)
+    private String myidkey;
 
     @Column(length = 15)
     private String regip;
@@ -37,6 +43,9 @@ public class User {
 
     @Column
     private int lastlogintime;
+
+    @Column(length = 6)
+    private String salt;
 
     @Column(length = 8)
     private String secques;
@@ -165,6 +174,30 @@ public class User {
 
     public boolean isAccountBinding() {
         return getBinding() != null && getBinding().getBinding() != null;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getMyid() {
+        return myid;
+    }
+
+    public void setMyid(String myid) {
+        this.myid = myid;
+    }
+
+    public String getMyidkey() {
+        return myidkey;
+    }
+
+    public void setMyidkey(String myidkey) {
+        this.myidkey = myidkey;
     }
 
 }
