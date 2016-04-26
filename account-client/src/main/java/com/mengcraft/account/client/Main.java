@@ -1,5 +1,6 @@
 package com.mengcraft.account.client;
 
+import com.mengcraft.account.lib.Messenger;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -8,6 +9,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 
     public static final String CHANNEL = "Account";
+
+    @Override
+    public void onEnable() {
+        saveDefaultConfig();
+
+        ChannelHandler handler = new ChannelHandler();
+        handler.setServer(getConfig().getString("server"));
+        handler.setMain(this);
+        handler.setMessenger(new Messenger(this));
+
+        getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, handler);
+    }
 
     public void execute(Runnable runnable, boolean sync) {
         if (sync) {

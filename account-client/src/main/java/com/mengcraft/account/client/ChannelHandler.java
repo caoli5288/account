@@ -20,14 +20,9 @@ import java.net.URLConnection;
 public class ChannelHandler implements PluginMessageListener {
 
     private final LockedList locked = LockedList.INSTANCE;
-    private final Main main;
-    private final Messenger messenger;
+    private Main main;
+    private Messenger messenger;
     private String server;
-
-    public ChannelHandler(Main main, Messenger messenger) {
-        this.main = main;
-        this.messenger = messenger;
-    }
 
     @Override
     public void onPluginMessageReceived(String tag, Player p, byte[] data) {
@@ -53,9 +48,9 @@ public class ChannelHandler implements PluginMessageListener {
                     main.execute(() -> {
                         locked.remove(p.getUniqueId());
                     }, true);
-                    messenger.send(p, "session.valid");
+                    messenger.send(p, "session.valid", ChatColor.GOLD + "启动器缓存登录成功");
                 } else {
-                    messenger.send(p, "session.invalid");
+                    messenger.send(p, "session.invalid", ChatColor.DARK_RED + "启动器缓存已经失效，请通过其他方式登录");
                 }
             }, false);
         }
@@ -78,6 +73,14 @@ public class ChannelHandler implements PluginMessageListener {
 
     public void setServer(String server) {
         this.server = server;
+    }
+
+    public void setMain(Main main) {
+        this.main = main;
+    }
+
+    public void setMessenger(Messenger messenger) {
+        this.messenger = messenger;
     }
 
 }
