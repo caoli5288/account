@@ -8,3 +8,4 @@ broadcast:
   - §6Bungee session login!
 logEvent: true
 coreMode: false
+kick: 600

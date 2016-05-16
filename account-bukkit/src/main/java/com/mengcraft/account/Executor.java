@@ -89,7 +89,7 @@ public class Executor extends Messenger implements Listener {
                     db.save(of(player, LOG_FAILURE));
                 }, true);
             }
-        }, 600);
+        }, main.getConfig().getInt("kick", 600));
         new BukkitRunnable() {
             public void run() {
                 if (player.isOnline() && isLocked(player.getUniqueId()))
