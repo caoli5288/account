@@ -1,9 +1,7 @@
-package com.mengcraft.account.bungee.server.action;
-
-import org.glassfish.grizzly.http.server.Request;
+package com.mengcraft.account.server.action;
 
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.QueryParam;
 
 /**
  * Created on 16-4-20.
@@ -13,7 +11,7 @@ public class ValidRequest {
     @PathParam("name")
     public String name;
 
-    @PathParam("session")
+    @QueryParam("session")
     public String session;
 
     public String getName() {

@@ -1,9 +1,9 @@
-package com.mengcraft.account.bungee.server;
+package com.mengcraft.account.server;
 
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
-import com.mengcraft.account.bungee.server.entity.BeanUser;
+import com.mengcraft.account.server.entity.BeanUser;
 
 import java.util.Properties;
 

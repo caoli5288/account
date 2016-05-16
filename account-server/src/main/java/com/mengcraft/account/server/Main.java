@@ -1,8 +1,8 @@
-package com.mengcraft.account.bungee.server;
+package com.mengcraft.account.server;
 
-import com.mengcraft.account.bungee.server.action.Login;
-import com.mengcraft.account.bungee.server.action.State;
-import com.mengcraft.account.bungee.server.action.Valid;
+import com.mengcraft.account.server.action.Login;
+import com.mengcraft.account.server.action.State;
+import com.mengcraft.account.server.action.Valid;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;

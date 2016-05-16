@@ -1,10 +1,9 @@
-package com.mengcraft.account.bungee.server.action;
+package com.mengcraft.account.server.action;
 
 import org.glassfish.grizzly.http.server.Request;
 
 import javax.ws.rs.PathParam;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 /**
@@ -15,7 +14,7 @@ public class LoginRequest {
     @PathParam("name")
     public String name;
 
-    @PathParam("secure")
+    @QueryParam("secure")
     public String secure;
 
     @Context

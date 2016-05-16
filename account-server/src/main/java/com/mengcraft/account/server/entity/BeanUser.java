@@ -1,4 +1,4 @@
-package com.mengcraft.account.bungee.server.entity;
+package com.mengcraft.account.server.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

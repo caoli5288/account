@@ -1,6 +1,6 @@
-package com.mengcraft.account.bungee.server.action;
+package com.mengcraft.account.server.action;
 
-import com.mengcraft.account.bungee.server.TimeoutMap;
+import com.mengcraft.account.server.lib.TimeoutMap;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
@@ -9,7 +9,7 @@ import javax.ws.rs.Path;
 /**
  * Created by on 16-4-14.
  */
-@Path("/valid/{name}/{session}")
+@Path("/valid/{name}")
 public class Valid {
 
     private static final TimeoutMap QUERY_TIMEOUT = new TimeoutMap(3000);

@@ -1,4 +1,4 @@
-package com.mengcraft.account.bungee.server;
+package com.mengcraft.account.server.lib;
 
 import java.util.Random;
 

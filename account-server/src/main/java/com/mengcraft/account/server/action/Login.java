@@ -1,11 +1,11 @@
-package com.mengcraft.account.bungee.server.action;
+package com.mengcraft.account.server.action;
 
-import com.mengcraft.account.bungee.server.Main;
-import com.mengcraft.account.bungee.server.SessionBuilder;
-import com.mengcraft.account.bungee.server.SessionMap;
-import com.mengcraft.account.bungee.server.entity.BeanUser;
-import com.mengcraft.account.bungee.server.MD5Util;
-import com.mengcraft.account.bungee.server.TimeoutMap;
+import com.mengcraft.account.server.Main;
+import com.mengcraft.account.server.lib.SessionBuilder;
+import com.mengcraft.account.server.lib.SessionMap;
+import com.mengcraft.account.server.entity.BeanUser;
+import com.mengcraft.account.server.lib.MD5Util;
+import com.mengcraft.account.server.lib.TimeoutMap;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
@@ -18,7 +18,7 @@ import static com.avaje.ebean.Ebean.find;
 /**
  * Created by on 16-4-14.
  */
-@Path("/login/{name}/{secure}")
+@Path("/login/{name}")
 public class Login {
 
     private static final TimeoutMap QUERY_TIMEOUT = new TimeoutMap(1500);
