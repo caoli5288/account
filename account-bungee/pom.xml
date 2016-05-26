@@ -7,7 +7,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>account-bungee</artifactId>
-    <version>1.0</version>
 
     <repositories>
         <repository>
@@ -24,4 +23,12 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
 </project>

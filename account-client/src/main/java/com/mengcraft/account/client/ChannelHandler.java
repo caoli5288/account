@@ -1,6 +1,7 @@
 package com.mengcraft.account.client;
 
-import com.mengcraft.account.LockedList;
+import com.mengcraft.account.BungeeSupport;
+import com.mengcraft.account.ExecutorLocked;
 import com.mengcraft.account.lib.Messenger;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -19,7 +20,8 @@ import java.net.URLConnection;
  */
 public class ChannelHandler implements PluginMessageListener {
 
-    private final LockedList locked = LockedList.INSTANCE;
+    private final BungeeSupport bungeeSupport = BungeeSupport.INSTANCE;
+    private final ExecutorLocked locked = ExecutorLocked.INSTANCE;
     private Main main;
     private Messenger messenger;
     private String server;
@@ -45,6 +47,7 @@ public class ChannelHandler implements PluginMessageListener {
             String session = input.readUTF();
             main.execute(() -> {
                 if (valid(name, session)) {
+                    bungeeSupport.sendLoggedIn(main, p);
                     main.execute(() -> {
                         locked.remove(p.getUniqueId());
                     }, true);
@@ -58,7 +61,7 @@ public class ChannelHandler implements PluginMessageListener {
 
     private boolean valid(String name, String session) {
         try {
-            URL url = new URL(server + "/valid" + '/' + name + '/' + session);
+            URL url = new URL(server + "/valid" + '/' + name + "?session=" + session);
             URLConnection connection = url.openConnection();
             InputStreamReader input = new InputStreamReader(connection.getInputStream());
 

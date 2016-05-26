@@ -58,21 +58,7 @@ Id | Description
 ## Session
 支持以会话的形式管理用户登陆。会话应该在玩家登陆之前请求服务器取得，
 在玩家登陆之后以PluginChannel形式交服务器校验。(Unstable API)
-
 ![](1.png)
-
-### Structure
-- X as int value
-- Y as int value
-- Z as int value
-
-### Protocol
-Id | Description       | Format     | Return
----|-------------------|------------|--------
-0  | Session request.  | User, Pass | Session
-1  | Session response. | Session    | None
-2  | Session check.    | Session    | None
-3  | Register request. | User, Pass | Session
 
 ## License
 本插件源代码及其二进制文件以GPLv2发布，请使用者遵守该协议。

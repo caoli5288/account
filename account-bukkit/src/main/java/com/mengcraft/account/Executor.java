@@ -3,8 +3,7 @@ package com.mengcraft.account;
 import com.avaje.ebean.EbeanServer;
 import com.mengcraft.account.entity.AppAccountEvent;
 import com.mengcraft.account.entity.User;
-import com.mengcraft.account.event.UserFetchedEvent;
-import com.mengcraft.account.event.UserSecureFetchedEvent;
+import com.mengcraft.account.event.UserLoggedInEvent;
 import com.mengcraft.account.lib.ArrayVector;
 import com.mengcraft.account.lib.Messenger;
 import com.mengcraft.account.lib.SecureUtil;
@@ -18,30 +17,22 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.mengcraft.account.BungeeSession.TAG;
-import static com.mengcraft.account.BungeeSession.sendSecure;
 import static com.mengcraft.account.entity.AppAccountEvent.LOG_FAILURE;
 import static com.mengcraft.account.entity.AppAccountEvent.LOG_SUCCESS;
 import static com.mengcraft.account.entity.AppAccountEvent.of;
-import static com.mengcraft.account.event.UserLoggedInEvent.postEvent;
 
 public class Executor extends Messenger implements Listener {
 
     private final Map<String, User> userMap = Account.DEFAULT.getUserMap();
     private final Main main;
     private final EbeanServer db;
-    private final LockedList locked = LockedList.INSTANCE;
-
-    private String[] bungeeSessionMsg;
+    private final ExecutorLocked locked = ExecutorLocked.INSTANCE;
+    private final BungeeSupport bungeeSupport = BungeeSupport.INSTANCE;
 
     public Executor(Main main) {
         super(main);
@@ -81,59 +72,31 @@ public class Executor extends Messenger implements Listener {
 
     @EventHandler
     public void handle(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        getScheduler().runTaskLater(getMain(), () -> {
-            if (player.isOnline() && isLocked(player.getUniqueId())) {
-                event.getPlayer().kickPlayer(find("login.kick", ChatColor.DARK_RED + "未登录"));
-                if (main.isLogEvent()) main.execute(() -> {
-                    db.save(of(player, LOG_FAILURE));
-                }, true);
-            }
-        }, main.getConfig().getInt("kick", 600));
-        new BukkitRunnable() {
-            public void run() {
-                if (player.isOnline() && isLocked(player.getUniqueId()))
-                    player.sendMessage(contents);
-                else
-                    cancel(); // Cancel if player exit or unlocked.
-            }
-        }.runTaskTimer(main, 20, castInterval);
-    }
-
-    @EventHandler
-    public void handle(UserFetchedEvent event) {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try {
-            DataOutputStream writer = new DataOutputStream(buf);
-            writer.write(1);
-            writer.writeUTF(event.getName());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        event.getPlayer().sendPluginMessage(main, TAG, buf.toByteArray());
-    }
-
-    @EventHandler
-    public void handle(UserSecureFetchedEvent event) {
-        User user = userMap.get(event.getName());
-        Player p = cast(user);
-        if (isLocked(p.getUniqueId()) && user.getPassword().equals(event.getSecure())) {
+        Player p = event.getPlayer();
+        if (bungeeSupport.hasLoggedIn(p)) {
             locked.remove(p.getUniqueId());
-            p.sendMessage(getBungeeMessage());
+        } else {
+            main.process(() -> {
+                if (p.isOnline() && isLocked(p.getUniqueId())) {
+                    event.getPlayer().kickPlayer(find("login.kick", ChatColor.DARK_RED + "未登录"));
+                    if (main.isLog()) {
+                        main.execute(() -> db.save(of(p, LOG_FAILURE)));
+                    }
+                }
+            }, main.getConfig().getInt("kick", 600));
+            new BukkitRunnable() {
+                public void run() {
+                    if (p.isOnline() && isLocked(p.getUniqueId()))
+                        p.sendMessage(contents);
+                    else
+                        cancel(); // Cancel if p exit or unlocked.
+                }
+            }.runTaskTimer(main, 20, castInterval);
         }
     }
 
     public void setCastInterval(int castInterval) {
         this.castInterval = castInterval;
-    }
-
-    public String[] getBungeeMessage() {
-        if (bungeeSessionMsg == null) {
-            bungeeSessionMsg = main.getConfig()
-                    .getStringList("broadcast.bungeeSession")
-                    .toArray(new String[0]);
-        }
-        return bungeeSessionMsg;
     }
 
     public void bind() {
@@ -154,10 +117,6 @@ public class Executor extends Messenger implements Listener {
 
     private Map<String, User> getUserMap() {
         return userMap;
-    }
-
-    private BukkitScheduler getScheduler() {
-        return getMain().getServer().getScheduler();
     }
 
     private void register(Player player, ArrayVector<String> vector) {
@@ -184,28 +143,29 @@ public class Executor extends Messenger implements Listener {
     }
 
     private void init(Player p, String pass, User user) {
+        bungeeSupport.sendLoggedIn(main, p);
+        locked.remove(p.getUniqueId());
         init(user, pass, p);
-        sendSecure(main, p, user.getPassword());
-        if (main.isLogEvent()) main.execute(() -> {
+        if (main.isLog()) main.execute(() -> {
             db.save(of(p, AppAccountEvent.REG_SUCCESS));
             db.save(of(p, LOG_SUCCESS));
-        }, true);
+        });
         send(p, "register.succeed", ChatColor.GREEN + "注册成功");
     }
 
-    private void login(Player player, ArrayVector<String> vector) {
+    private void login(Player p, ArrayVector<String> vector) {
         if (vector.remain() != 0) {
-            User user = getUserMap().get(player.getName());
+            User user = getUserMap().get(p.getName());
             if (user != null && user.valid() && user.valid(vector.next())) {
-                locked.remove(player.getUniqueId());
-                send(player, "login.done", ChatColor.GREEN + "登陆成功");
-                if (main.isLogEvent()) main.execute(() -> {
-                    db.save(of(player, LOG_SUCCESS));
-                }, true);
-                postEvent(player);
-                sendSecure(main, player, user.getPassword());
+                bungeeSupport.sendLoggedIn(main, p);
+                locked.remove(p.getUniqueId());
+                send(p, "login.done", ChatColor.GREEN + "登陆成功");
+                if (main.isLog()) {
+                    main.execute(() -> db.save(of(p, LOG_SUCCESS)));
+                }
+                UserLoggedInEvent.post(p);
             } else {
-                send(player, "login.password", ChatColor.DARK_RED + "密码错误");
+                send(p, "login.password", ChatColor.DARK_RED + "密码错误");
             }
         }
     }
@@ -227,10 +187,7 @@ public class Executor extends Messenger implements Listener {
         user.setMyid("");
         user.setMyidkey("");
 
-        main.execute(() -> {
-            db.save(user);
-        }, true);
-        locked.remove(p.getUniqueId());
+        main.execute(() -> db.save(user));
     }
 
     private int nowSec() {

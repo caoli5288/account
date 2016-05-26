@@ -26,9 +26,9 @@ import static com.mengcraft.account.lib.CollectionUtil.convertTo;
 /**
  * Created on 15-10-26.
  */
-public class EventBlocker implements Listener {
+public class ExecutorEvent implements Listener {
 
-    private final LockedList locked = LockedList.INSTANCE;
+    private final ExecutorLocked locked = ExecutorLocked.INSTANCE;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void handle(PlayerLoginEvent event) {

@@ -7,9 +7,9 @@ import java.util.UUID;
 /**
  * Created by on 16-4-22.
  */
-public class LockedList {
+public class ExecutorLocked {
 
-    public static final LockedList INSTANCE = new LockedList();
+    public static final ExecutorLocked INSTANCE = new ExecutorLocked();
 
     private final List<UUID> locked = new ArrayList<>();
 

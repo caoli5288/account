@@ -13,7 +13,8 @@ import java.util.Map;
 
 public class ExecutorCore implements Listener {
 
-    private final Map<String, User> userMap = Account.DEFAULT.getUserMap();
+    private final BungeeSupport bungeeSupport = BungeeSupport.INSTANCE;
+    private final Map<String, User> map = Account.DEFAULT.getUserMap();
     private final Main main;
     private final EbeanServer db;
 
@@ -28,34 +29,36 @@ public class ExecutorCore implements Listener {
 
     @EventHandler
     public void handle(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+        Player p = event.getPlayer();
+        if (main.isMinimal() || !bungeeSupport.hasLoggedIn(p)) {
+            processJoin(p);
+        }
+    }
+
+    private void processJoin(Player p) {
         main.execute(() -> {
             User user = db.find(User.class)
                     .where()
-                    .eq("username", player.getName())
+                    .eq("username", p.getName())
                     .findUnique();
             if (user == null) {
-                getUserMap().put(player.getName(), db.createEntityBean(User.class));
+                map.put(p.getName(), db.createEntityBean(User.class));
             } else {
-                getUserMap().put(player.getName(), user);
-                main.execute(() -> {
-                    callEvent(new UserFetchedEvent(player, user));
-                }, false);
+                main.process(() -> {
+                    post(new UserFetchedEvent(p, user));
+                });
+                map.put(p.getName(), user);
             }
-        }, true);
+        });
     }
 
     @EventHandler
     public void handle(PlayerQuitEvent event) {
-        getUserMap().remove(event.getPlayer().getName());
+        map.remove(event.getPlayer().getName());
     }
 
-    private void callEvent(UserFetchedEvent event) {
+    private void post(UserFetchedEvent event) {
         main.getServer().getPluginManager().callEvent(event);
-    }
-
-    public Map<String, User> getUserMap() {
-        return userMap;
     }
 
 }

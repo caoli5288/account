@@ -29,7 +29,7 @@ public class UserLoggedInEvent extends Event {
         return player;
     }
 
-    public static void postEvent(Player player) {
+    public static void post(Player player) {
         player.getServer().getPluginManager().callEvent(new UserLoggedInEvent(player));
     }
 

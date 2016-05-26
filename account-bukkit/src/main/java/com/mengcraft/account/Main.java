@@ -3,7 +3,6 @@ package com.mengcraft.account;
 import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.AppAccountEvent;
 import com.mengcraft.account.entity.User;
-import com.mengcraft.account.lib.Messenger;
 import com.mengcraft.account.lib.MetricsLite;
 import com.mengcraft.simpleorm.EbeanHandler;
 import com.mengcraft.simpleorm.EbeanManager;
@@ -12,16 +11,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
 
-    private boolean logEvent;
-    private boolean coreMode;
+    private boolean log;
+    private boolean minimal;
 
     @Override
     public void onEnable() {
         getConfig().options().copyDefaults(true);
         saveConfig();
-
-        setCoreMode(getConfig().getBoolean("coreMode"));
-        setLogEvent(getConfig().getBoolean("logEvent"));
 
         EbeanHandler source = EbeanManager.DEFAULT.getHandler(this);
         if (!source.isInitialized()) {
@@ -37,44 +33,47 @@ public class Main extends JavaPlugin {
         source.install(true);
         source.reflect();
 
+
+        minimal = getConfig().getBoolean("minimal");
         new ExecutorCore(this).bind();
-        if (!coreMode) {
-            new BungeeSession(this).bind();
+        if (!minimal) {
+            log = getConfig().getBoolean("log");
             new Executor(this).bind();
-            new EventBlocker().bind(this);
+            new ExecutorEvent().bind(this);
+            getServer().getMessenger().registerIncomingPluginChannel(this, BungeeSupport.CHANNEL, BungeeSupport.INSTANCE);
+            getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeSupport.CHANNEL);
         }
 
         new MetricsLite(this).start();
 
-        String[] message = {
+        getServer().getConsoleSender().sendMessage(new String[]{
                 ChatColor.GREEN + "梦梦家高性能服务器出租店",
                 ChatColor.GREEN + "shop105595113.taobao.com"
-        };
-        getServer().getConsoleSender().sendMessage(message);
+        });
     }
 
-    public void setCoreMode(boolean coreMode) {
-        this.coreMode = coreMode;
+    public boolean isLog() {
+        return log;
     }
 
-    public boolean isCoreMode() {
-        return coreMode;
+    public void execute(Runnable runnable) {
+        getServer().getScheduler().runTaskAsynchronously(this, runnable);
     }
 
-    public void setLogEvent(boolean logEvent) {
-        this.logEvent = logEvent;
+    public static boolean eq(Object i, Object j) {
+        return i == j || (i != null && i.equals(j));
     }
 
-    public boolean isLogEvent() {
-        return logEvent;
+    public boolean isMinimal() {
+        return minimal;
     }
 
-    public void execute(Runnable runnable, boolean b) {
-        if (b) {
-            getServer().getScheduler().runTaskAsynchronously(this, runnable);
-        } else {
-            getServer().getScheduler().runTask(this, runnable);
-        }
+    public void process(Runnable task, int tick) {
+        getServer().getScheduler().runTaskLater(this, task, tick);
+    }
+
+    public void process(Runnable task) {
+        getServer().getScheduler().runTask(this, task);
     }
 
 }
