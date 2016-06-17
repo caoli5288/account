@@ -3,6 +3,7 @@ package com.mengcraft.account;
 import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.AppAccountEvent;
 import com.mengcraft.account.entity.User;
+import com.mengcraft.account.lib.Messenger;
 import com.mengcraft.account.lib.MetricsLite;
 import com.mengcraft.simpleorm.EbeanHandler;
 import com.mengcraft.simpleorm.EbeanManager;
@@ -35,10 +36,11 @@ public class Main extends JavaPlugin {
 
 
         minimal = getConfig().getBoolean("minimal");
-        new ExecutorCore(this).bind();
+        Messenger messenger = new Messenger(this);
+        new ExecutorCore(this, messenger).bind();
         if (!minimal) {
             log = getConfig().getBoolean("log");
-            new Executor(this).bind();
+            new Executor(this, messenger).bind();
             new ExecutorEvent().bind(this);
             getServer().getMessenger().registerIncomingPluginChannel(this, BungeeSupport.CHANNEL, BungeeSupport.INSTANCE);
             getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeSupport.CHANNEL);

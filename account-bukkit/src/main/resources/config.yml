@@ -6,3 +6,5 @@ broadcast:
 minimal: false
 log: true
 kick: 600
+notify:
+  mail: true

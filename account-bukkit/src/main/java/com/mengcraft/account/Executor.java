@@ -26,16 +26,17 @@ import static com.mengcraft.account.entity.AppAccountEvent.LOG_FAILURE;
 import static com.mengcraft.account.entity.AppAccountEvent.LOG_SUCCESS;
 import static com.mengcraft.account.entity.AppAccountEvent.of;
 
-public class Executor extends Messenger implements Listener {
+public class Executor implements Listener {
 
     private final Map<String, User> userMap = Account.DEFAULT.getUserMap();
     private final Main main;
+    private final Messenger messenger;
     private final EbeanServer db;
     private final ExecutorLocked locked = ExecutorLocked.INSTANCE;
     private final BungeeSupport bungeeSupport = BungeeSupport.INSTANCE;
 
-    public Executor(Main main) {
-        super(main);
+    public Executor(Main main, Messenger messenger) {
+        this.messenger = messenger;
         this.main = main;
         this.db = main.getDatabase();
     }
@@ -63,10 +64,10 @@ public class Executor extends Messenger implements Listener {
     public void handle(AsyncPlayerPreLoginEvent event) {
         if (event.getName().length() > 15) {
             event.setLoginResult(Result.KICK_OTHER);
-            event.setKickMessage(find("login.length", "用户名长度不能大于15位"));
+            event.setKickMessage(messenger.find("login.length", "用户名长度不能大于15位"));
         } else if (!event.getName().matches("[\\w]+")) {
             event.setLoginResult(Result.KICK_OTHER);
-            event.setKickMessage(find("login.except", "用户名只能包含英文数字下划线"));
+            event.setKickMessage(messenger.find("login.except", "用户名只能包含英文数字下划线"));
         }
     }
 
@@ -78,7 +79,7 @@ public class Executor extends Messenger implements Listener {
         } else {
             main.process(() -> {
                 if (p.isOnline() && isLocked(p.getUniqueId())) {
-                    event.getPlayer().kickPlayer(find("login.kick", ChatColor.DARK_RED + "未登录"));
+                    event.getPlayer().kickPlayer(messenger.find("login.kick", ChatColor.DARK_RED + "未登录"));
                     if (main.isLog()) {
                         main.execute(() -> db.save(of(p, LOG_FAILURE)));
                     }
@@ -123,20 +124,20 @@ public class Executor extends Messenger implements Listener {
         if (vector.remain() == 2) {
             register(player, vector.next(), vector.next());
         } else {
-            send(player, "register.format", ChatColor.DARK_RED + "输入/register <密码> <重复密码>以完成注册");
+            messenger.send(player, "register.format", ChatColor.DARK_RED + "输入/register <密码> <重复密码>以完成注册");
         }
     }
 
     private void register(Player p, String pass, String next) {
         User user = getUserMap().get(p.getName());
         if (user == null) {
-            send(p, "login.wait", ChatColor.DARK_RED + "用户账户数据拉取中，请稍候");
+            messenger.send(p, "login.wait", ChatColor.DARK_RED + "用户账户数据拉取中，请稍候");
         } else if (user.valid()) {
-            send(p, "register.failure", ChatColor.DARK_RED + "注册失败");
+            messenger.send(p, "register.failure", ChatColor.DARK_RED + "注册失败");
         } else if (pass.length() < 6) {
-            send(p, "register.password.short", ChatColor.DARK_RED + "注册失败，请使用6位长度以上的密码");
+            messenger.send(p, "register.password.short", ChatColor.DARK_RED + "注册失败，请使用6位长度以上的密码");
         } else if (!pass.equals(next)) {
-            send(p, "register.password.equal", ChatColor.DARK_RED + "注册失败，两次输入的密码内容不一致");
+            messenger.send(p, "register.password.equal", ChatColor.DARK_RED + "注册失败，两次输入的密码内容不一致");
         } else {
             init(p, pass, user);
         }
@@ -150,7 +151,7 @@ public class Executor extends Messenger implements Listener {
             db.save(of(p, AppAccountEvent.REG_SUCCESS));
             db.save(of(p, LOG_SUCCESS));
         });
-        send(p, "register.succeed", ChatColor.GREEN + "注册成功");
+        messenger.send(p, "register.succeed", ChatColor.GREEN + "注册成功");
     }
 
     private void login(Player p, ArrayVector<String> vector) {
@@ -159,13 +160,13 @@ public class Executor extends Messenger implements Listener {
             if (user != null && user.valid() && user.valid(vector.next())) {
                 bungeeSupport.sendLoggedIn(main, p);
                 locked.remove(p.getUniqueId());
-                send(p, "login.done", ChatColor.GREEN + "登陆成功");
+                messenger.send(p, "login.done", ChatColor.GREEN + "登陆成功");
                 if (main.isLog()) {
                     main.execute(() -> db.save(of(p, LOG_SUCCESS)));
                 }
                 UserLoggedInEvent.post(p);
             } else {
-                send(p, "login.password", ChatColor.DARK_RED + "密码错误");
+                messenger.send(p, "login.password", ChatColor.DARK_RED + "密码错误");
             }
         }
     }
