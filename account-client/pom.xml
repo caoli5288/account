@@ -11,7 +11,7 @@
     <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
+            <artifactId>craftbukkit</artifactId>
             <version>1.7.10-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
@@ -21,6 +21,17 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>repo.md-5.net</id>
+            <url>http://repo.md-5.net/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>ci-mengcraft</id>
+            <url>http://ci.mengcraft.com:8080/plugin/repository/everything/</url>
+        </repository>
+    </repositories>
 
     <build>
         <resources>

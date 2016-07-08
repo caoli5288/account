@@ -4,6 +4,9 @@ broadcast:
   - §6请您输入/l <密码>以验证您的账户
   - §6或者/reg <密码> <密码>以设置密码
 minimal: false
+binding:
+  command: true
+  execute: 'server 玩家%s刚刚绑定了正版账号'
 log: true
 kick: 600
 notify:

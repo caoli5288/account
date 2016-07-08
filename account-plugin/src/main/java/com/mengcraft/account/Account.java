@@ -32,4 +32,7 @@ public class Account {
         return user != null ? user.getUid() : 0;
     }
 
+    public User getUser(Player p) {
+        return userMap.get(p.getName());
+    }
 }

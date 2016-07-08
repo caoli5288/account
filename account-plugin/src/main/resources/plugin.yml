@@ -3,4 +3,9 @@ main: com.mengcraft.account.Main
 version: ${project.version}
 author: mengcraft.com
 
+commands:
+  binding:
+    aliases: ['正版绑定']
+    description: None.
+
 depend: [SimpleORM]
