@@ -8,8 +8,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>account-bukkit</module>
-        <module>account-bungee</module>
+        <module>account-plugin</module>
         <module>account-server</module>
         <module>account-client</module>
     </modules>

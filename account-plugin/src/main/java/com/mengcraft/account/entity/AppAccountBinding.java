@@ -1,5 +1,6 @@
 package com.mengcraft.account.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -14,6 +15,7 @@ public class AppAccountBinding {
     @Id
     private int uid;
 
+    @Column(unique = true)
     private String binding;
 
     @JoinColumn(name = "uid")

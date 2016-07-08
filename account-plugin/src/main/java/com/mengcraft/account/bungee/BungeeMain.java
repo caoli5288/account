@@ -1,5 +1,6 @@
 package com.mengcraft.account.bungee;
 
+import com.mengcraft.account.lib.ReadWriteUtil;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -8,7 +9,6 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -17,9 +17,9 @@ import java.io.IOException;
 /**
  * Created on 16-2-17.
  */
-public class Main extends Plugin implements Listener {
+public class BungeeMain extends Plugin implements Listener {
 
-    public static final String CHANNEL = "AccountBungeeSession";
+    public static final String CHANNEL = "AccountBungee";
 
     @Override
     public void onEnable() {

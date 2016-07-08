@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.mengcraft.account.Main.eq;
+import static com.mengcraft.account.bungee.BungeeMain.CHANNEL;
 
 /**
  * Created on 16-2-17.
@@ -20,10 +20,11 @@ import static com.mengcraft.account.Main.eq;
 public class BungeeSupport implements PluginMessageListener {
 
     public static final BungeeSupport INSTANCE = new BungeeSupport();
-    private final Map<String, String> map = new HashMap<>();
 
     private BungeeSupport() {
     }
+
+    private final Map<String, String> map = new HashMap<>();
 
     @Override
     public void onPluginMessageReceived(String tag, Player p, byte[] data) {
@@ -59,7 +60,5 @@ public class BungeeSupport implements PluginMessageListener {
         }
         p.sendPluginMessage(plugin, CHANNEL, buf.toByteArray());
     }
-
-    public static final String CHANNEL = "AccountBungeeSession";
 
 }

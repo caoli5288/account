@@ -1,4 +1,4 @@
 name: Account
-main: Main
+main: com.mengcraft.account.bungee.BungeeMain
 version: ${project.version}
 author: mengcraft
