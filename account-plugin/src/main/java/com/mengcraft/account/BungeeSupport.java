@@ -1,6 +1,8 @@
 package com.mengcraft.account;
 
 import com.mengcraft.account.lib.ReadWriteUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -32,14 +34,23 @@ public class BungeeSupport implements PluginMessageListener {
         try {
             byte b = input.readByte();
             if (b == 1) {
-                map.put(input.readUTF(), input.readUTF());
+                String name = input.readUTF();
+                String ip = input.readUTF();
+                map.put(name, ip);
+                OfflinePlayer j = Bukkit.getOfflinePlayer(name);
+                if (ExecutorLocked.INSTANCE.isLocked(j.getUniqueId()) && j.isOnline()) {
+                    Player i = j.getPlayer();
+                    if (Main.eq(ip, i.getAddress().getAddress().getHostAddress())) {
+                        ExecutorLocked.INSTANCE.remove(j.getUniqueId());
+                    }
+                }
             } else if (b == 2) {
                 map.remove(input.readUTF());
             } else {
                 throw new IllegalArgumentException(String.valueOf(b));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
