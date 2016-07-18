@@ -24,6 +24,7 @@ public class BungeeMain extends Plugin implements Listener {
     @Override
     public void onEnable() {
         getProxy().registerChannel(CHANNEL);
+        getProxy().getPluginManager().registerListener(this, this);
     }
 
     @EventHandler
