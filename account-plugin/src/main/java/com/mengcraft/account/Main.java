@@ -44,12 +44,12 @@ public class Main extends JavaPlugin {
             new Executor(this, new Messenger(this)).bind();
             new ExecutorEvent().bind(this);
 
+            if (getConfig().getBoolean("binding.command")) {
+                getCommand("binding").setExecutor(new BindingCommand(this));
+            }
+
             getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMain.CHANNEL, BungeeSupport.INSTANCE);
             getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMain.CHANNEL);
-        }
-
-        if (getConfig().getBoolean("binding.command")) {
-            getCommand("binding").setExecutor(new BindingCommand(this));
         }
 
         new MetricsLite(this).start();

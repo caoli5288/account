@@ -30,7 +30,6 @@ public class BindingCommand implements CommandExecutor {
 
     private final Set<String> locked = new HashSet<>();
     private final Main main;
-    private final Account account = Account.INSTANCE;
 
     public BindingCommand(Main main) {
         this.main = main;
@@ -58,7 +57,7 @@ public class BindingCommand implements CommandExecutor {
                 p.sendMessage(ChatColor.GRAY + "输入\"/正版绑定 正版账号 正版密码\"进行绑定");
             }
         } else {
-            Member member = account.getMember(p);
+            Member member = Account.INSTANCE.getMember(p);
             if (eq(member, null)) {
                 p.sendMessage(ChatColor.GRAY + "账号数据正在获取，请稍后再尝试");
             } else {
@@ -75,7 +74,7 @@ public class BindingCommand implements CommandExecutor {
     }
 
     private boolean execute(Player p, String name, String pass) {
-        Member member = account.getMember(p);
+        Member member = Account.INSTANCE.getMember(p);
         if (eq(member, null)) {
             p.sendMessage(ChatColor.GRAY + "账号数据正在获取，请稍后再尝试");
         } else {
