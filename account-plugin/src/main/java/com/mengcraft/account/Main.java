@@ -4,7 +4,7 @@ import com.mengcraft.account.bungee.BungeeMain;
 import com.mengcraft.account.command.BindingCommand;
 import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.AppAccountEvent;
-import com.mengcraft.account.entity.User;
+import com.mengcraft.account.entity.Member;
 import com.mengcraft.account.lib.Messenger;
 import com.mengcraft.account.lib.MetricsLite;
 import com.mengcraft.simpleorm.EbeanHandler;
@@ -25,7 +25,7 @@ public class Main extends JavaPlugin {
         if (!source.isInitialized()) {
             source.define(AppAccountBinding.class);
             source.define(AppAccountEvent.class);
-            source.define(User.class);
+            source.define(Member.class);
             try {
                 source.initialize();
             } catch (Exception e) {
@@ -37,12 +37,15 @@ public class Main extends JavaPlugin {
 
 
         Messenger messenger = new Messenger(this);
-        new ExecutorCore(this, messenger).bind();
+        new ExecutorCore(this).bind();
 
         log = getConfig().getBoolean("log");
 
         new Executor(this, messenger).bind();
         new ExecutorEvent().bind(this);
+
+        Account.INSTANCE.setMain(this);
+
         getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMain.CHANNEL, BungeeSupport.INSTANCE);
         getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMain.CHANNEL);
 

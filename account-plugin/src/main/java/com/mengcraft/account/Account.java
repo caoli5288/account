@@ -1,6 +1,6 @@
 package com.mengcraft.account;
 
-import com.mengcraft.account.entity.User;
+import com.mengcraft.account.entity.Member;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -8,31 +8,56 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Account {
 
-    public static final Account DEFAULT = new Account();
+    public static final Account INSTANCE = new Account();
 
-    private final Map<String, User> userMap;
+    private final Map<String, Member> handle;
+    private Main main;
 
     private Account() {
-        this.userMap = new ConcurrentHashMap<>();
+        this.handle = new ConcurrentHashMap<>();
     }
 
-    public Map<String, User> getUserMap() {
-        return userMap;
+    public int getMemberKey(String name) {
+        return a(handle.get(name));
     }
 
-    public int getUserKey(String name) {
-        return a(userMap.get(name));
+    public int getMemberKey(Player player) {
+        return a(handle.get(player.getName()));
     }
 
-    public int getUserKey(Player player) {
-        return a(userMap.get(player.getName()));
+    private int a(Member member) {
+        return member != null ? member.getUid() : 0;
     }
 
-    private int a(User user) {
-        return user != null ? user.getUid() : 0;
+    public void drop(String name) {
+        handle.remove(name);
     }
 
-    public User getUser(Player p) {
-        return userMap.get(p.getName());
+    public Member getMember(String name) {
+        Member j = handle.get(name);
+        if (Main.eq(j, null)) {
+            j = fetch(name);
+        }
+        return j;
     }
+
+    private Member fetch(String name) {
+        Member member = main.getDatabase().find(Member.class)
+                .where()
+                .eq("username", name)
+                .findUnique();
+        if (Main.eq(member, null)) {
+            member = new Member();
+        }
+        return member;
+    }
+
+    public Member getMember(Player p) {
+        return getMember(p.getName());
+    }
+
+    public void setMain(Main main) {
+        this.main = main;
+    }
+
 }

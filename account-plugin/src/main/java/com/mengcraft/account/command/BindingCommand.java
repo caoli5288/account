@@ -4,7 +4,7 @@ import com.avaje.ebean.EbeanServer;
 import com.mengcraft.account.Account;
 import com.mengcraft.account.Main;
 import com.mengcraft.account.entity.AppAccountBinding;
-import com.mengcraft.account.entity.User;
+import com.mengcraft.account.entity.Member;
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
@@ -30,7 +30,7 @@ public class BindingCommand implements CommandExecutor {
 
     private final Set<String> locked = new HashSet<>();
     private final Main main;
-    private final Account account = Account.DEFAULT;
+    private final Account account = Account.INSTANCE;
 
     public BindingCommand(Main main) {
         this.main = main;
@@ -58,11 +58,11 @@ public class BindingCommand implements CommandExecutor {
                 p.sendMessage(ChatColor.GRAY + "输入\"/正版绑定 正版账号 正版密码\"进行绑定");
             }
         } else {
-            User user = account.getUser(p);
-            if (eq(user, null)) {
+            Member member = account.getMember(p);
+            if (eq(member, null)) {
                 p.sendMessage(ChatColor.GRAY + "账号数据正在获取，请稍后再尝试");
             } else {
-                AppAccountBinding binding = user.getBinding();
+                AppAccountBinding binding = member.getBinding();
                 if (eq(binding, null)) {
                     p.sendMessage(ChatColor.GRAY + "您未绑定正版账号，输入\"/正版绑定 正版账号 正版密码\"进行绑定");
                 } else {
@@ -75,11 +75,11 @@ public class BindingCommand implements CommandExecutor {
     }
 
     private boolean execute(Player p, String name, String pass) {
-        User user = account.getUser(p);
-        if (eq(user, null)) {
+        Member member = account.getMember(p);
+        if (eq(member, null)) {
             p.sendMessage(ChatColor.GRAY + "账号数据正在获取，请稍后再尝试");
         } else {
-            AppAccountBinding binding = user.getBinding();
+            AppAccountBinding binding = member.getBinding();
             if (eq(binding, null) && locked.add(p.getName())) {
                 main.execute(() -> {
                     YggdrasilUserAuthentication remote = new YggdrasilUserAuthentication(new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString()), Agent.MINECRAFT);
@@ -88,7 +88,7 @@ public class BindingCommand implements CommandExecutor {
                     try {
                         remote.logIn();
                         if (remote.canPlayOnline()) {
-                            execute(p, user, name);
+                            execute(p, member, name);
                         } else {
                             p.sendMessage(ChatColor.RED + "发生了一些问题，认证出错或正版验证服务器无法连接");
                         }
@@ -105,7 +105,7 @@ public class BindingCommand implements CommandExecutor {
         return false;
     }
 
-    private void execute(Player p, User user, String name) {
+    private void execute(Player p, Member member, String name) {
         EbeanServer db = main.getDatabase();
         db.beginTransaction();
         try {
@@ -116,16 +116,16 @@ public class BindingCommand implements CommandExecutor {
             if (eq(dup, null)) {
                 AppAccountBinding binding = new AppAccountBinding();
                 binding.setBinding(name);
-                binding.setUser(user);
-                user.setBinding(binding);
-                db.save(user);
+                binding.setMember(member);
+                member.setBinding(binding);
+                db.save(member);
                 db.commitTransaction();
                 p.sendMessage(ChatColor.GOLD + "正版账号绑定成功");
                 main.process(() -> {
                     main.getServer().dispatchCommand(main.getServer().getConsoleSender(), String.format(main.getConfig().getString("binding.execute"), p.getName()));
                 });
             } else {
-                p.sendMessage(ChatColor.GOLD + "该正版账号已绑定：" + dup.getUser().getUsername());
+                p.sendMessage(ChatColor.GOLD + "该正版账号已绑定：" + dup.getMember().getUsername());
             }
         } finally {
             db.endTransaction();

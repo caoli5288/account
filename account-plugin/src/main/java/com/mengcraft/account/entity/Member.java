@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "pre_ucenter_members")
-public class User {
+public class Member {
 
     @Id
     private int uid;

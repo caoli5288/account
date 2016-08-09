@@ -20,7 +20,7 @@ public class AppAccountBinding {
 
     @JoinColumn(name = "uid")
     @OneToOne
-    private User user;
+    private Member member;
 
     public int getUid() {
         return uid;
@@ -38,12 +38,12 @@ public class AppAccountBinding {
         this.binding = binding;
     }
 
-    public User getUser() {
-        return user;
+    public Member getMember() {
+        return member;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
 }
