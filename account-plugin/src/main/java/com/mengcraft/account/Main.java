@@ -15,7 +15,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 
     private boolean log;
-    private boolean minimal;
 
     @Override
     public void onEnable() {
@@ -37,16 +36,15 @@ public class Main extends JavaPlugin {
         source.reflect();
 
 
-        minimal = getConfig().getBoolean("minimal");
         Messenger messenger = new Messenger(this);
         new ExecutorCore(this, messenger).bind();
-        if (!minimal) {
-            log = getConfig().getBoolean("log");
-            new Executor(this, messenger).bind();
-            new ExecutorEvent().bind(this);
-            getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMain.CHANNEL, BungeeSupport.INSTANCE);
-            getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMain.CHANNEL);
-        }
+
+        log = getConfig().getBoolean("log");
+
+        new Executor(this, messenger).bind();
+        new ExecutorEvent().bind(this);
+        getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMain.CHANNEL, BungeeSupport.INSTANCE);
+        getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMain.CHANNEL);
 
         if (getConfig().getBoolean("binding.command")) {
             getCommand("binding").setExecutor(new BindingCommand(this));
@@ -54,10 +52,11 @@ public class Main extends JavaPlugin {
 
         new MetricsLite(this).start();
 
-        getServer().getConsoleSender().sendMessage(new String[]{
+        String[] j = {
                 ChatColor.GREEN + "梦梦家高性能服务器出租店",
                 ChatColor.GREEN + "shop105595113.taobao.com"
-        });
+        };
+        getServer().getConsoleSender().sendMessage(j);
     }
 
     public boolean isLog() {
@@ -70,10 +69,6 @@ public class Main extends JavaPlugin {
 
     public static boolean eq(Object i, Object j) {
         return i == j || (i != null && i.equals(j));
-    }
-
-    public boolean isMinimal() {
-        return minimal;
     }
 
     public void process(Runnable task, int tick) {

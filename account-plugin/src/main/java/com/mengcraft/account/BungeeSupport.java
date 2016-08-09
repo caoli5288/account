@@ -38,10 +38,10 @@ public class BungeeSupport implements PluginMessageListener {
                 String ip = input.readUTF();
                 map.put(name, ip);
                 OfflinePlayer j = Bukkit.getOfflinePlayer(name);
-                if (ExecutorLocked.INSTANCE.isLocked(j.getUniqueId()) && j.isOnline()) {
+                if (LockedList.INSTANCE.isLocked(j.getUniqueId()) && j.isOnline()) {
                     Player i = j.getPlayer();
                     if (Main.eq(ip, i.getAddress().getAddress().getHostAddress())) {
-                        ExecutorLocked.INSTANCE.remove(j.getUniqueId());
+                        LockedList.INSTANCE.remove(j.getUniqueId());
                     }
                 }
             } else if (b == 2) {

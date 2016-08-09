@@ -36,7 +36,7 @@ public class ExecutorCore implements Listener {
     @EventHandler
     public void handle(PlayerJoinEvent event) {
         Player p = event.getPlayer();
-        if (main.isMinimal() || !bungeeSupport.hasLoggedIn(p)) {
+        if (!bungeeSupport.hasLoggedIn(p)) {
             processJoin(p);
         }
     }
@@ -51,7 +51,7 @@ public class ExecutorCore implements Listener {
                 map.put(p.getName(), db.createEntityBean(User.class));
             } else {
                 if (mail && (user.getEmail() == null || user.getEmail().equals(""))) {
-                    messenger.send(p, "notify.mail", ChatColor.GOLD + "帐号安全请尽快前往论坛绑定邮箱");
+                    messenger.send(p, "notify.mail", ChatColor.GOLD + "为了您的帐号安全请尽快前往论坛绑定邮箱");
                 }
                 main.process(() -> {
                     post(new UserFetchedEvent(p, user));

@@ -32,7 +32,7 @@ public class Executor implements Listener {
     private final Main main;
     private final Messenger messenger;
     private final EbeanServer db;
-    private final ExecutorLocked locked = ExecutorLocked.INSTANCE;
+    private final LockedList locked = LockedList.INSTANCE;
     private final BungeeSupport bungeeSupport = BungeeSupport.INSTANCE;
 
     public Executor(Main main, Messenger messenger) {

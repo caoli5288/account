@@ -28,7 +28,7 @@ import static com.mengcraft.account.lib.CollectionUtil.convertTo;
  */
 public class ExecutorEvent implements Listener {
 
-    private final ExecutorLocked locked = ExecutorLocked.INSTANCE;
+    private final LockedList locked = LockedList.INSTANCE;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void handle(PlayerLoginEvent event) {
