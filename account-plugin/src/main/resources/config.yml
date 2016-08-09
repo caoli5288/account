@@ -6,6 +6,7 @@ broadcast:
 binding:
   command: true
   execute: 'server 玩家%s刚刚绑定了正版账号'
+minimal: false
 log: true
 kick: 600
 notify:

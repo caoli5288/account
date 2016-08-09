@@ -35,19 +35,18 @@ public class Main extends JavaPlugin {
         source.install(true);
         source.reflect();
 
-
-        Messenger messenger = new Messenger(this);
-        new ExecutorCore(this).bind();
-
+        Account.INSTANCE.setMain(this);
         log = getConfig().getBoolean("log");
 
-        new Executor(this, messenger).bind();
-        new ExecutorEvent().bind(this);
+        new ExecutorCore(this).bind();
 
-        Account.INSTANCE.setMain(this);
+        if (!getConfig().getBoolean("minimal")) {
+            new Executor(this, new Messenger(this)).bind();
+            new ExecutorEvent().bind(this);
 
-        getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMain.CHANNEL, BungeeSupport.INSTANCE);
-        getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMain.CHANNEL);
+            getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMain.CHANNEL, BungeeSupport.INSTANCE);
+            getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMain.CHANNEL);
+        }
 
         if (getConfig().getBoolean("binding.command")) {
             getCommand("binding").setExecutor(new BindingCommand(this));
@@ -62,16 +61,8 @@ public class Main extends JavaPlugin {
         getServer().getConsoleSender().sendMessage(j);
     }
 
-    public boolean isLog() {
-        return log;
-    }
-
     public void execute(Runnable runnable) {
         getServer().getScheduler().runTaskAsynchronously(this, runnable);
-    }
-
-    public static boolean eq(Object i, Object j) {
-        return i == j || (i != null && i.equals(j));
     }
 
     public void process(Runnable task, int tick) {
@@ -80,6 +71,14 @@ public class Main extends JavaPlugin {
 
     public void process(Runnable task) {
         getServer().getScheduler().runTask(this, task);
+    }
+
+    public boolean isLog() {
+        return log;
+    }
+
+    public static boolean eq(Object i, Object j) {
+        return i == j || (i != null && i.equals(j));
     }
 
 }
