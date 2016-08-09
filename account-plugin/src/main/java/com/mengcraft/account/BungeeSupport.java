@@ -60,12 +60,17 @@ public class BungeeSupport implements PluginMessageListener {
     }
 
     public void sendLoggedIn(Plugin plugin, Player p) {
+        String name = p.getName();
+        String ip = p.getAddress().getAddress().getHostAddress();
+
+        map.put(name, ip);// Force set local map.
+
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         DataOutput output = ReadWriteUtil.toDataOutput(buf);
         try {
             output.writeByte(0);
-            output.writeUTF(p.getName());
-            output.writeUTF(p.getAddress().getAddress().getHostAddress());
+            output.writeUTF(name);
+            output.writeUTF(ip);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
