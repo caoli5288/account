@@ -4,10 +4,9 @@ import com.avaje.ebean.EbeanServer;
 import com.mengcraft.account.entity.AppAccountEvent;
 import com.mengcraft.account.entity.Member;
 import com.mengcraft.account.event.UserLoggedInEvent;
-import com.mengcraft.account.lib.ArrayVector;
+import com.mengcraft.account.lib.It;
 import com.mengcraft.account.lib.Messenger;
 import com.mengcraft.account.lib.SecureUtil;
-import com.mengcraft.account.lib.StringUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,8 +29,6 @@ public class Executor implements Listener {
     private final Main main;
     private final Messenger messenger;
     private final EbeanServer db;
-    private final LockedList locked = LockedList.INSTANCE;
-    private final BungeeSupport bungeeSupport = BungeeSupport.INSTANCE;
 
     public Executor(Main main, Messenger messenger) {
         this.messenger = messenger;
@@ -45,13 +42,12 @@ public class Executor implements Listener {
     @EventHandler
     public void handle(PlayerCommandPreprocessEvent event) {
         if (isLocked(event.getPlayer().getUniqueId())) {
-            String[] d = StringUtil.DEF.split(event.getMessage());
-            ArrayVector<String> vector = new ArrayVector<>(d);
-            String c = vector.next();
-            if (c.equals("/l") || c.equals("/login")) {
-                processLogin(event.getPlayer(), vector);
-            } else if (c.equals("/r") || c.equals("/reg") || c.equals("/register")) {
-                register(event.getPlayer(), vector);
+            It<String> it = new It<>(event.getMessage().split(" "));
+            String j = it.next();
+            if (j.equals("/l") || j.equals("/login")) {
+                processLogin(event.getPlayer(), it);
+            } else if (j.equals("/r") || j.equals("/reg") || j.equals("/register")) {
+                register(event.getPlayer(), it);
             }
             event.setCancelled(true);
         }
@@ -71,8 +67,8 @@ public class Executor implements Listener {
     @EventHandler
     public void handle(PlayerJoinEvent event) {
         Player p = event.getPlayer();
-        if (bungeeSupport.hasLoggedIn(p)) {
-            locked.remove(p.getUniqueId());
+        if (BungeeSupport.INSTANCE.hasLoggedIn(p)) {
+            LockedList.INSTANCE.remove(p.getUniqueId());
         } else {
             new BukkitRunnable() {
                 public void run() {
@@ -105,9 +101,9 @@ public class Executor implements Listener {
         setCastInterval(main.getConfig().getInt("broadcast.interval"));
     }
 
-    private void register(Player player, ArrayVector<String> vector) {
-        if (vector.remain() == 2) {
-            register(player, vector.next(), vector.next());
+    private void register(Player player, It<String> it) {
+        if (Main.eq(it.size() - it.nextIndex(), 2)) {
+            register(player, it.next(), it.next());
         } else {
             messenger.send(player, "register.format", ChatColor.DARK_RED + "输入/register <密码> <重复密码>以完成注册");
         }
@@ -153,19 +149,19 @@ public class Executor implements Listener {
             db.save(of(p, LOG_SUCCESS));
         }
 
-        bungeeSupport.sendLoggedIn(main, p);
-        locked.remove(p.getUniqueId());
+        BungeeSupport.INSTANCE.sendLoggedIn(main, p);
+        LockedList.INSTANCE.remove(p.getUniqueId());
 
         messenger.send(p, "register.succeed", ChatColor.GREEN + "注册成功");
     }
 
-    private void processLogin(Player p, ArrayVector<String> it) {
+    private void processLogin(Player p, It<String> it) {
         if (it.hasNext()) {
             main.execute(() -> {// IO blocking.
                 Member j = Account.INSTANCE.getMember(p);
                 if (j.valid() && j.valid(it.next())) {
-                    bungeeSupport.sendLoggedIn(main, p);
-                    locked.remove(p.getUniqueId());
+                    BungeeSupport.INSTANCE.sendLoggedIn(main, p);
+                    LockedList.INSTANCE.remove(p.getUniqueId());
                     messenger.send(p, "login.done", ChatColor.GREEN + "登录成功");
                     if (main.isLog()) {
                         main.execute(() -> db.save(of(p, LOG_SUCCESS)));
@@ -183,7 +179,7 @@ public class Executor implements Listener {
     }
 
     private boolean isLocked(UUID uuid) {
-        return locked.isLocked(uuid);
+        return LockedList.INSTANCE.isLocked(uuid);
     }
 
     private void setContents(List<String> list) {
