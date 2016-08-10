@@ -18,8 +18,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getConfig().options().copyDefaults(true);
-        saveConfig();
+        saveDefaultConfig();
 
         EbeanHandler source = EbeanManager.DEFAULT.getHandler(this);
         if (!source.isInitialized()) {

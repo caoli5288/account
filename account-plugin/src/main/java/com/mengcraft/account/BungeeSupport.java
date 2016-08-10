@@ -1,5 +1,7 @@
 package com.mengcraft.account;
 
+import com.mengcraft.account.bungee.BungeeMain;
+import com.mengcraft.account.bungee.BungeeMessage;
 import com.mengcraft.account.lib.ReadWriteUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -7,10 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,27 +29,25 @@ public class BungeeSupport implements PluginMessageListener {
 
     @Override
     public void onPluginMessageReceived(String tag, Player p, byte[] data) {
+        if (Main.eq(tag, BungeeMain.CHANNEL)) {
+            processMessage(data);
+        }
+    }
+
+    private void processMessage(byte[] data) {
         DataInput input = ReadWriteUtil.toDataInput(data);
-        try {
-            byte b = input.readByte();
-            if (b == 1) {
-                String name = input.readUTF();
-                String ip = input.readUTF();
-                map.put(name, ip);
-                OfflinePlayer j = Bukkit.getOfflinePlayer(name);
-                if (LockedList.INSTANCE.isLocked(j.getUniqueId()) && j.isOnline()) {
-                    Player i = j.getPlayer();
-                    if (Main.eq(ip, i.getAddress().getAddress().getHostAddress())) {
-                        LockedList.INSTANCE.remove(j.getUniqueId());
-                    }
+        BungeeMessage message = BungeeMessage.read(input);
+        if (Main.eq(message.getType(), BungeeMain.ADD_LOGGED)) {
+            map.put(message.getName(), message.getIp());
+            OfflinePlayer j = Bukkit.getOfflinePlayer(message.getName());
+            if (LockedList.INSTANCE.isLocked(j.getUniqueId()) && j.isOnline()) {
+                Player p = j.getPlayer();
+                if (Main.eq(message.getIp(), p.getAddress().getAddress().getHostAddress())) {
+                    LockedList.INSTANCE.remove(j.getUniqueId());
                 }
-            } else if (b == 2) {
-                map.remove(input.readUTF());
-            } else {
-                throw new IllegalArgumentException(String.valueOf(b));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else if (Main.eq(message.getType(), BungeeMain.DEL_LOGGED)) {
+            map.remove(message.getName());
         }
     }
 
@@ -60,21 +57,13 @@ public class BungeeSupport implements PluginMessageListener {
     }
 
     public void sendLoggedIn(Plugin plugin, Player p) {
-        String name = p.getName();
-        String ip = p.getAddress().getAddress().getHostAddress();
+        BungeeMessage message = new BungeeMessage();
+        message.setType(BungeeMain.DISTRIBUTE);
+        message.setName(p.getName());
+        message.setIp(p.getAddress().getAddress().getHostAddress());
 
-        map.put(name, ip);// Force set local map.
-
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        DataOutput output = ReadWriteUtil.toDataOutput(buf);
-        try {
-            output.writeByte(0);
-            output.writeUTF(name);
-            output.writeUTF(ip);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        p.sendPluginMessage(plugin, CHANNEL, buf.toByteArray());
+        map.put(message.getName(), message.getIp());// Force set local map.
+        p.sendPluginMessage(plugin, CHANNEL, message.toByteArray());
     }
 
 }
