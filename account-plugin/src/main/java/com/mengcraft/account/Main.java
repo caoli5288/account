@@ -38,8 +38,6 @@ public class Main extends JavaPlugin {
         Account.INSTANCE.setMain(this);
         log = getConfig().getBoolean("log");
 
-        new ExecutorCore(this).bind();
-
         if (!getConfig().getBoolean("minimal")) {
             new Executor(this, new Messenger(this)).bind();
             new ExecutorEvent().bind(this);

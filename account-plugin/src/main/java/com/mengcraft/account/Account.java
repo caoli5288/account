@@ -25,7 +25,7 @@ public class Account {
         return getMemberKey(p.getName());
     }
 
-    public void drop(String name) {
+    void drop(String name) {
         handle.remove(name);
     }
 
@@ -47,6 +47,10 @@ public class Account {
             member = new Member();
         }
         return member;
+    }
+
+    public boolean hasMemberFetched(String name) {
+        return handle.containsKey(name);
     }
 
     public Member getMember(Player p) {

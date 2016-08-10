@@ -15,6 +15,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
@@ -87,6 +88,11 @@ public class Executor implements Listener {
                 }
             }, main.getConfig().getInt("kick", 600));
         }
+    }
+
+    @EventHandler
+    public void handle(PlayerQuitEvent event) {
+        Account.INSTANCE.drop(event.getPlayer().getName());
     }
 
     public void setCastInterval(int castInterval) {
