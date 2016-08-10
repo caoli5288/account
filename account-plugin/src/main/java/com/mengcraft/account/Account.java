@@ -18,15 +18,11 @@ public class Account {
     }
 
     public int getMemberKey(String name) {
-        return a(handle.get(name));
+        return getMember(name).getUid();
     }
 
-    public int getMemberKey(Player player) {
-        return a(handle.get(player.getName()));
-    }
-
-    private int a(Member member) {
-        return member != null ? member.getUid() : 0;
+    public int getMemberKey(Player p) {
+        return getMemberKey(p.getName());
     }
 
     public void drop(String name) {
@@ -37,6 +33,7 @@ public class Account {
         Member j = handle.get(name);
         if (Main.eq(j, null)) {
             j = fetch(name);
+            handle.put(name, j);
         }
         return j;
     }
