@@ -1,7 +1,7 @@
-package com.mengcraft.account;
+package com.mengcraft.account.bungee;
 
-import com.mengcraft.account.bungee.BungeeMain;
-import com.mengcraft.account.bungee.BungeeMessage;
+import com.mengcraft.account.LockedList;
+import com.mengcraft.account.Main;
 import com.mengcraft.account.lib.ReadWriteUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

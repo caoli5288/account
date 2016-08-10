@@ -1,6 +1,6 @@
 package com.mengcraft.account.client;
 
-import com.mengcraft.account.BungeeSupport;
+import com.mengcraft.account.bungee.BungeeSupport;
 import com.mengcraft.account.LockedList;
 import com.mengcraft.account.lib.Messenger;
 import org.bukkit.ChatColor;

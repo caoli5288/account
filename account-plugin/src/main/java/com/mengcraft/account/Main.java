@@ -1,6 +1,7 @@
 package com.mengcraft.account;
 
 import com.mengcraft.account.bungee.BungeeMain;
+import com.mengcraft.account.bungee.BungeeSupport;
 import com.mengcraft.account.command.BindingCommand;
 import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.AppAccountEvent;

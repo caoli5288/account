@@ -1,6 +1,7 @@
 package com.mengcraft.account;
 
 import com.avaje.ebean.EbeanServer;
+import com.mengcraft.account.bungee.BungeeSupport;
 import com.mengcraft.account.entity.AppAccountEvent;
 import com.mengcraft.account.entity.Member;
 import com.mengcraft.account.event.UserLoggedInEvent;
