@@ -1,6 +1,5 @@
 package com.mengcraft.account.entity;
 
-import com.avaje.ebean.EbeanServer;
 import com.mengcraft.account.lib.SecureUtil;
 
 import javax.persistence.CascadeType;
@@ -124,17 +123,6 @@ public class Member {
 
     public void setBinding(AppAccountBinding binding) {
         this.binding = binding;
-    }
-
-    public void initBinding(EbeanServer db) {
-        if (getBinding() != null) {
-            throw new UnsupportedOperationException("initBinding");
-        }
-        setBinding(db.createEntityBean(AppAccountBinding.class));
-    }
-
-    public boolean isAccountBinding() {
-        return getBinding() != null && getBinding().getBinding() != null;
     }
 
     public String getEmail() {
