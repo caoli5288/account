@@ -61,8 +61,6 @@ public class BungeeSupport implements PluginMessageListener {
         message.setType(BungeeMain.DISTRIBUTE);
         message.setName(p.getName());
         message.setIp(p.getAddress().getAddress().getHostAddress());
-
-        map.put(message.getName(), message.getIp());// Force set local map.
         p.sendPluginMessage(plugin, CHANNEL, message.toByteArray());
     }
 
