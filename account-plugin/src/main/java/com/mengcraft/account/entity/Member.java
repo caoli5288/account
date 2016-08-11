@@ -35,7 +35,7 @@ public class Member {
     @Column(length = 6)
     private String salt;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "member")
     private AppAccountBinding binding;
 
     public int getUid() {
