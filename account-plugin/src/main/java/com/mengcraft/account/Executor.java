@@ -145,10 +145,7 @@ public class Executor implements Listener {
         member.setUsername(p.getName());
         member.setRegip(p.getAddress().getAddress().getHostAddress());
         member.setRegdate(unixTime());
-        member.setSecques("");
         member.setEmail("");
-        member.setMyid("");
-        member.setMyidkey("");
 
         db.save(member); //May throw exception.
         if (main.isLog()) {

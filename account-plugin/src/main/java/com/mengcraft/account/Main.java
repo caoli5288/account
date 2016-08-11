@@ -21,19 +21,19 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
-        EbeanHandler source = EbeanManager.DEFAULT.getHandler(this);
-        if (!source.isInitialized()) {
-            source.define(AppAccountBinding.class);
-            source.define(AppAccountEvent.class);
-            source.define(Member.class);
+        EbeanHandler db = EbeanManager.DEFAULT.getHandler(this);
+        if (!db.isInitialized()) {
+            db.define(AppAccountBinding.class);
+            db.define(AppAccountEvent.class);
+            db.define(Member.class);
             try {
-                source.initialize();
+                db.initialize();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        source.install(true);
-        source.reflect();
+        db.install(true);
+        db.reflect();
 
         Account.INSTANCE.setMain(this);
         log = getConfig().getBoolean("log");

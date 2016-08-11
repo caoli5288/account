@@ -26,29 +26,14 @@ public class Member {
     @Column(length = 32)
     private String email;
 
-    @Column(length = 30)
-    private String myid;
-
-    @Column(length = 16)
-    private String myidkey;
-
     @Column(length = 15)
     private String regip;
 
     @Column
     private int regdate;
 
-    @Column
-    private int lastloginip;
-
-    @Column
-    private int lastlogintime;
-
     @Column(length = 6)
     private String salt;
-
-    @Column(length = 8)
-    private String secques;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private AppAccountBinding binding;
@@ -133,30 +118,6 @@ public class Member {
         this.regdate = regdate;
     }
 
-    public int getLastloginip() {
-        return lastloginip;
-    }
-
-    public void setLastloginip(int lastloginip) {
-        this.lastloginip = lastloginip;
-    }
-
-    public int getLastlogintime() {
-        return lastlogintime;
-    }
-
-    public void setLastlogintime(int lastlogintime) {
-        this.lastlogintime = lastlogintime;
-    }
-
-    public String getSecques() {
-        return secques;
-    }
-
-    public void setSecques(String secques) {
-        this.secques = secques;
-    }
-
     public AppAccountBinding getBinding() {
         return binding;
     }
@@ -182,22 +143,6 @@ public class Member {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getMyid() {
-        return myid;
-    }
-
-    public void setMyid(String myid) {
-        this.myid = myid;
-    }
-
-    public String getMyidkey() {
-        return myidkey;
-    }
-
-    public void setMyidkey(String myidkey) {
-        this.myidkey = myidkey;
     }
 
 }
