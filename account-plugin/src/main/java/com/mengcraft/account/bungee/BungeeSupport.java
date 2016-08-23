@@ -37,7 +37,7 @@ public class BungeeSupport implements PluginMessageListener {
         DataInput input = ReadWriteUtil.toDataInput(data);
         BungeeMessage message = BungeeMessage.read(input);
         if (eq(message.getType(), BungeeMain.ADD_LOGGED)) {
-            Player p = Bukkit.getPlayer(message.getName());
+            Player p = Bukkit.getPlayerExact(message.getName());
             if (!eq(p, null) && LockedList.INSTANCE.isLocked(p.getUniqueId())) {
                 if (eq(message.getIp(), p.getAddress().getAddress().getHostAddress())) {
                     LockedList.INSTANCE.remove(p.getUniqueId());
