@@ -109,7 +109,7 @@ public class Executor implements Listener {
     }
 
     private void register(Player player, It<String> it) {
-        if (Main.eq(it.size() - it.nextIndex(), 2)) {
+        if (Main.eq(it.length() - it.nextIndex(), 2)) {
             register(player, it.next(), it.next());
         } else {
             messenger.send(player, "register.format", ChatColor.DARK_RED + "输入/register <密码> <重复密码>以完成注册");

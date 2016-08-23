@@ -26,7 +26,7 @@ public class It<E> implements Iterator<E> {
         return index != handle.length;
     }
 
-    public int size() {
+    public int length() {
         return handle.length;
     }
 

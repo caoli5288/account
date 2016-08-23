@@ -53,6 +53,10 @@ public class Account {
         return handle.containsKey(name);
     }
 
+    public boolean hasMemberFetched(Player p) {
+        return handle.containsKey(p.getName());
+    }
+
     public Member getMember(Player p) {
         return getMember(p.getName());
     }
