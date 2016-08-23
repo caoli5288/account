@@ -6,8 +6,8 @@ import com.mengcraft.account.command.BindingCommand;
 import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.AppAccountEvent;
 import com.mengcraft.account.entity.Member;
-import com.mengcraft.account.lib.Messenger;
-import com.mengcraft.account.lib.MetricsLite;
+import com.mengcraft.account.util.Messenger;
+import com.mengcraft.account.util.MetricsLite;
 import com.mengcraft.simpleorm.EbeanHandler;
 import com.mengcraft.simpleorm.EbeanManager;
 import org.bukkit.ChatColor;
@@ -73,10 +73,6 @@ public class Main extends JavaPlugin {
 
     public boolean isLog() {
         return log;
-    }
-
-    public static boolean eq(Object i, Object j) {
-        return i == j || (i != null && i.equals(j));
     }
 
 }

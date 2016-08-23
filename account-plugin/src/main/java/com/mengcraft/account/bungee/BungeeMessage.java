@@ -1,6 +1,6 @@
 package com.mengcraft.account.bungee;
 
-import com.mengcraft.account.lib.ReadWriteUtil;
+import com.mengcraft.account.util.ReadWriteUtil;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.io.ByteArrayOutputStream;

@@ -5,7 +5,7 @@ import com.mengcraft.account.Account;
 import com.mengcraft.account.Main;
 import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.Member;
-import com.mengcraft.account.lib.It;
+import com.mengcraft.account.util.It;
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.mengcraft.account.Main.eq;
+import static com.mengcraft.account.util.Util.eq;
 
 /**
  * Created on 16-7-8.
@@ -44,7 +44,7 @@ public class BindingCommand implements CommandExecutor {
 
     private boolean execute(Player p, It<String> it) {
         if (it.hasNext()) {
-            if (Main.eq(it.length(), 2)) {
+            if (eq(it.length(), 2)) {
                 return execute(p, it.next(), it.next());
             } else {
                 p.sendMessage(ChatColor.GRAY + "输入\"/正版绑定 正版账号 正版密码\"进行绑定");
@@ -92,7 +92,7 @@ public class BindingCommand implements CommandExecutor {
                         .where()
                         .eq("binding", name)
                         .findUnique();
-                if (Main.eq(j1, null)) {
+                if (eq(j1, null)) {
                     processQuery(p, name, pass);
                 } else {
                     p.sendMessage(ChatColor.RED + "该账号已被玩家"

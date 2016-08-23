@@ -1,6 +1,6 @@
 package com.mengcraft.account.bungee;
 
-import com.mengcraft.account.lib.ReadWriteUtil;
+import com.mengcraft.account.util.ReadWriteUtil;
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -10,6 +10,8 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.DataInput;
+
+import static com.mengcraft.account.util.Util.eq;
 
 /**
  * Created on 16-2-17.
@@ -32,10 +34,6 @@ public class BungeeMain extends Plugin implements Listener {
         if (eq(event.getTag(), CHANNEL)) {
             processMessage(event.getSender(), event.getData());
         }
-    }
-
-    public static boolean eq(Object i, Object j) {
-        return i == j || (i != null && i.equals(j));
     }
 
     private void processMessage(Connection sender, byte[] data) {

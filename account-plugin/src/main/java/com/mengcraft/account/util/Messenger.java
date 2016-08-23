@@ -1,4 +1,4 @@
-package com.mengcraft.account.lib;
+package com.mengcraft.account.util;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

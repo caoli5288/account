@@ -1,7 +1,7 @@
 package com.mengcraft.account.client;
 
 import com.mengcraft.account.bungee.BungeeMain;
-import com.mengcraft.account.lib.Messenger;
+import com.mengcraft.account.util.Messenger;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**

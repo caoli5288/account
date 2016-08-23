@@ -21,7 +21,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Set;
 
-import static com.mengcraft.account.lib.CollectionUtil.convertTo;
+import static com.mengcraft.account.util.CollectionUtil.convertTo;
 
 /**
  * Created on 15-10-26.

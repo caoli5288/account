@@ -1,4 +1,4 @@
-package com.mengcraft.account.lib;
+package com.mengcraft.account.util;
 
 import java.util.ArrayList;
 import java.util.Collection;

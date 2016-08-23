@@ -5,9 +5,9 @@ import com.mengcraft.account.bungee.BungeeSupport;
 import com.mengcraft.account.entity.AppAccountEvent;
 import com.mengcraft.account.entity.Member;
 import com.mengcraft.account.event.UserLoggedInEvent;
-import com.mengcraft.account.lib.It;
-import com.mengcraft.account.lib.Messenger;
-import com.mengcraft.account.lib.SecureUtil;
+import com.mengcraft.account.util.It;
+import com.mengcraft.account.util.Messenger;
+import com.mengcraft.account.util.SecureUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,6 +25,7 @@ import java.util.UUID;
 import static com.mengcraft.account.entity.AppAccountEvent.LOG_FAILURE;
 import static com.mengcraft.account.entity.AppAccountEvent.LOG_SUCCESS;
 import static com.mengcraft.account.entity.AppAccountEvent.of;
+import static com.mengcraft.account.util.Util.eq;
 
 public class Executor implements Listener {
 
@@ -47,7 +48,7 @@ public class Executor implements Listener {
             It<String> it = new It<>(event.getMessage().split(" "));
             String j = it.next();
             if (j.equals("/l") || j.equals("/login")) {
-                processLogin(event.getPlayer(), it);
+                processPreLogin(event.getPlayer(), it);
             } else if (j.equals("/r") || j.equals("/reg") || j.equals("/register")) {
                 register(event.getPlayer(), it);
             }
@@ -109,7 +110,7 @@ public class Executor implements Listener {
     }
 
     private void register(Player player, It<String> it) {
-        if (Main.eq(it.length() - it.nextIndex(), 2)) {
+        if (eq(it.length() - it.nextIndex(), 2)) {
             register(player, it.next(), it.next());
         } else {
             messenger.send(player, "register.format", ChatColor.DARK_RED + "输入/register <密码> <重复密码>以完成注册");
@@ -123,7 +124,7 @@ public class Executor implements Listener {
                 messenger.send(p, "register.failure", ChatColor.DARK_RED + "注册失败");
             } else if (pass.length() < 6) {
                 messenger.send(p, "register.password.short", ChatColor.DARK_RED + "注册失败，请使用6位长度以上的密码");
-            } else if (!Main.eq(pass, next)) {
+            } else if (!eq(pass, next)) {
                 messenger.send(p, "register.password.equal", ChatColor.DARK_RED + "注册失败，两次输入的密码内容不一致");
             } else {
                 init(p, pass, j);
@@ -159,22 +160,26 @@ public class Executor implements Listener {
         messenger.send(p, "register.succeed", ChatColor.GREEN + "注册成功");
     }
 
-    private void processLogin(Player p, It<String> it) {
+    private void processPreLogin(Player p, It<String> it) {
         if (it.hasNext()) {
-            main.execute(() -> {// IO blocking.
-                Member j = Account.INSTANCE.getMember(p);
-                if (j.valid() && j.valid(it.next())) {
-                    BungeeSupport.INSTANCE.sendLoggedIn(main, p);
-                    LockedList.INSTANCE.remove(p.getUniqueId());
-                    messenger.send(p, "login.done", ChatColor.GREEN + "登录成功");
-                    if (main.isLog()) {
-                        main.execute(() -> db.save(of(p, LOG_SUCCESS)));
-                    }
-                    UserLoggedInEvent.post(p);
-                } else {
-                    messenger.send(p, "login.password", ChatColor.DARK_RED + "密码错误");
-                }
+            main.execute(() -> processLogin(p, it.next()));
+        }
+    }
+
+    private void processLogin(Player p, String password) {
+        Member j = Account.INSTANCE.getMember(p);// Need threading
+        if (j.valid() && j.valid(password)) {
+            BungeeSupport.INSTANCE.sendLoggedIn(main, p);
+            main.process(() -> {// Thread safe
+                LockedList.INSTANCE.remove(p.getUniqueId());
+                UserLoggedInEvent.post(p);
             });
+            if (main.isLog()) {
+                db.save(of(p, LOG_SUCCESS));
+            }
+            messenger.send(p, "login.done", ChatColor.GREEN + "登录成功");
+        } else {
+            messenger.send(p, "login.password", ChatColor.DARK_RED + "密码错误");
         }
     }
 

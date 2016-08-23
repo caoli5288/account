@@ -1,4 +1,4 @@
-package com.mengcraft.account.lib;
+package com.mengcraft.account.util;
 
 import java.security.MessageDigest;
 import java.security.SecureRandom;

@@ -1,6 +1,6 @@
 package com.mengcraft.account.entity;
 
-import com.mengcraft.account.lib.SecureUtil;
+import com.mengcraft.account.util.SecureUtil;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
