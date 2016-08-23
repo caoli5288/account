@@ -5,7 +5,9 @@ broadcast:
   - §6或者/reg <密码> <密码>以设置密码
 binding:
   command: true
-  execute: 'server 玩家%s刚刚绑定了正版账号'
+  # 多行以分号';'隔开
+  # 变量$p自动替换成玩家名
+  execute: ""
 minimal: false
 log: true
 kick: 600

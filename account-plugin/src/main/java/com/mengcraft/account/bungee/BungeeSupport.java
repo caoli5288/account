@@ -49,6 +49,7 @@ public class BungeeSupport implements PluginMessageListener {
         } else if (Main.eq(message.getType(), BungeeMain.DEL_LOGGED)) {
             map.remove(message.getName());
         }
+        Bukkit.getLogger().info("Receive " + message.toString());
     }
 
     public boolean hasLoggedIn(Player p) {
@@ -61,6 +62,7 @@ public class BungeeSupport implements PluginMessageListener {
         message.setType(BungeeMain.DISTRIBUTE);
         message.setName(p.getName());
         message.setIp(p.getAddress().getAddress().getHostAddress());
+        plugin.getLogger().info("Send " + message.toString());
         p.sendPluginMessage(plugin, CHANNEL, message.toByteArray());
     }
 

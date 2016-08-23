@@ -12,6 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.net.Proxy;
@@ -121,7 +122,7 @@ public class BindingCommand implements CommandExecutor {
                 db.commitTransaction();
                 p.sendMessage(ChatColor.GOLD + "正版账号绑定成功");
                 main.process(() -> {
-                    main.getServer().dispatchCommand(main.getServer().getConsoleSender(), String.format(main.getConfig().getString("binding.execute"), p.getName()));
+                    callback(main.getServer().getConsoleSender(), main.getConfig().getString("binding.execute"), p.getName());
                 });
             } else {
                 p.sendMessage(ChatColor.GOLD + "该正版账号已绑定：" + dup.getMember().getUsername());
@@ -130,4 +131,11 @@ public class BindingCommand implements CommandExecutor {
             db.endTransaction();
         }
     }
+
+    private void callback(CommandSender sender, String string, String name) {
+        for (String line : string.replace("$p", name).split(";")) {
+            main.getServer().dispatchCommand(sender, line);
+        }
+    }
+
 }

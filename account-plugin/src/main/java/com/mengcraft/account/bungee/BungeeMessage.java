@@ -67,6 +67,15 @@ public class BungeeMessage {
         }
     }
 
+    @Override
+    public String toString() {
+        return ("message " +
+                "type " + type + ", " +
+                "name " + name + ", " +
+                "ip " + ip
+        );
+    }
+
     public static BungeeMessage read(DataInput input) {
         BungeeMessage info = new BungeeMessage();
         try {
