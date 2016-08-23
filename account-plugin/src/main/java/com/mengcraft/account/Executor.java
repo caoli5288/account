@@ -155,7 +155,10 @@ public class Executor implements Listener {
         }
 
         BungeeSupport.INSTANCE.sendLoggedIn(main, p);
-        LockedList.INSTANCE.remove(p.getUniqueId());
+
+        main.process(() -> { // Thread safe
+            LockedList.INSTANCE.remove(p.getUniqueId());
+        });
 
         messenger.send(p, "register.succeed", ChatColor.GREEN + "注册成功");
     }
