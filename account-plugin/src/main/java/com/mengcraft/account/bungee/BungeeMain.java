@@ -1,8 +1,6 @@
 package com.mengcraft.account.bungee;
 
-import com.mengcraft.account.Main;
 import com.mengcraft.account.lib.ReadWriteUtil;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -11,10 +9,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 
 /**
  * Created on 16-2-17.
@@ -34,16 +29,20 @@ public class BungeeMain extends Plugin implements Listener {
 
     @EventHandler
     public void handle(PluginMessageEvent event) {
-        if (Main.eq(event.getTag(), CHANNEL)) {
+        if (eq(event.getTag(), CHANNEL)) {
             processMessage(event.getSender(), event.getData());
         }
+    }
+
+    public static boolean eq(Object i, Object j) {
+        return i == j || (i != null && i.equals(j));
     }
 
     private void processMessage(Connection sender, byte[] data) {
         if (sender instanceof Server) {
             DataInput input = ReadWriteUtil.toDataInput(data);
             BungeeMessage message = BungeeMessage.read(input);
-            if (message.valid() && Main.eq(message.getType(), DISTRIBUTE)) {
+            if (message.valid() && eq(message.getType(), DISTRIBUTE)) {
                 message.setType(ADD_LOGGED);
                 message.broadcast(getProxy().getServers().values());
             }
