@@ -51,12 +51,21 @@ public class Account {
         return member;
     }
 
-    public boolean hasMemberFetched(String name) {
+    public boolean memberFetched(String name) {
         return handle.containsKey(name);
     }
 
-    public boolean hasMemberFetched(Player p) {
+    public boolean memberFetched(Player p) {
         return handle.containsKey(p.getName());
+    }
+
+    public boolean memberBinding(Player p) {
+        return memberBinding(p.getName());
+    }
+
+    public boolean memberBinding(String name) {
+        Member member = getMember(name);
+        return member != null && member.getBinding() != null;
     }
 
     public Member getMember(Player p) {

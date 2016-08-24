@@ -71,15 +71,10 @@ public class BindingCommand implements CommandExecutor {
     }
 
     private boolean execute(Player p, String name, String pass) {
-        if (Account.INSTANCE.hasMemberFetched(p)) {
-            AppAccountBinding binding = Account.INSTANCE.getMember(p).getBinding();
-            if (eq(binding, null)) {
-                return processPreQuery(p, name, pass);
-            } else {
-                p.sendMessage(ChatColor.GOLD + "您已绑定正版账号，请勿重复绑定");
-            }
+        if (Account.INSTANCE.memberBinding(p)) {
+            p.sendMessage(ChatColor.GOLD + "您已绑定正版账号，请勿重复绑定");
         } else {
-            p.sendMessage(ChatColor.GRAY + "账号数据正在获取，请稍后再尝试");
+            return processPreQuery(p, name, pass);
         }
         return false;
     }

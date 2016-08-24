@@ -15,7 +15,7 @@ public class AppAccountBinding {
     @Id
     private int uid;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String binding;
 
     @JoinColumn(name = "uid")
