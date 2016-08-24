@@ -22,7 +22,7 @@ public class Member {
     @Column(length = 32)
     private String password;
 
-    @Column(length = 32)
+    @Column(length = 32, nullable = false)
     private String email;
 
     @Column(length = 15)

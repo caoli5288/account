@@ -181,6 +181,9 @@ public class Executor implements Listener {
                 db.save(of(p, LOG_SUCCESS));
             }
             messenger.send(p, "login.done", ChatColor.GREEN + "登录成功");
+            if (j.getEmail().isEmpty() && main.notifyMail()) {
+                messenger.send(p, "notify.mail", ChatColor.RED + "为了您的账号安全请尽快前往论坛用户中心绑定密保邮箱");
+            }
         } else {
             messenger.send(p, "login.password", ChatColor.DARK_RED + "密码错误");
         }

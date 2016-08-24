@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 
     private boolean log;
+    private boolean notifyMail;
 
     @Override
     public void onEnable() {
@@ -37,6 +38,7 @@ public class Main extends JavaPlugin {
 
         Account.INSTANCE.setMain(this);
         log = getConfig().getBoolean("log");
+        notifyMail = getConfig().getBoolean("notify.mail");
 
         if (!getConfig().getBoolean("minimal")) {
             new Executor(this, new Messenger(this)).bind();
@@ -69,6 +71,10 @@ public class Main extends JavaPlugin {
 
     public void process(Runnable task) {
         getServer().getScheduler().runTask(this, task);
+    }
+
+    public boolean notifyMail() {
+        return notifyMail;
     }
 
     public boolean isLog() {
