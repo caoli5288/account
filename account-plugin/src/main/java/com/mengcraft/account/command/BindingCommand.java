@@ -102,14 +102,14 @@ public class BindingCommand implements CommandExecutor {
         return false;
     }
 
-    private void processQuery(Player p, String name, String pass) {
+    private void processQuery(Player p, String mail, String pass) {
         YggdrasilUserAuthentication remote = new YggdrasilUserAuthentication(new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString()), Agent.MINECRAFT);
-        remote.setUsername(name);
+        remote.setUsername(mail);
         remote.setPassword(pass);
         try {
             remote.logIn();
             if (remote.canPlayOnline()) {
-                execute(p, Account.INSTANCE.getMember(p), name);
+                execute(p, Account.INSTANCE.getMember(p), mail, remote.getSelectedProfile().getId());
             } else {
                 p.sendMessage(ChatColor.RED + "发生了一些问题，认证出错或正版验证服务器无法连接");
             }
@@ -118,12 +118,13 @@ public class BindingCommand implements CommandExecutor {
         }
     }
 
-    private void execute(Player p, Member member, String name) {
+    private void execute(Player p, Member member, String name, UUID id) {
         EbeanServer db = main.getDatabase();
         db.beginTransaction();
         try {
             AppAccountBinding binding = new AppAccountBinding();
             binding.setBinding(name);
+            binding.setBindingId(id);
             binding.setMember(member);
             member.setBinding(binding);
             db.save(member);
