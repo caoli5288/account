@@ -126,8 +126,8 @@ public class BindingCommand implements CommandExecutor {
             binding.setBinding(name);
             binding.setBindingId(id);
             binding.setMember(member);
-            member.setBinding(binding);
-            db.save(member);
+            db.save(binding);
+            db.refresh(member);// Force refresh from db
             db.commitTransaction();
             p.sendMessage(ChatColor.GOLD + "正版账号绑定成功");
             main.process(() -> {
