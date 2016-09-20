@@ -43,6 +43,7 @@ Id | Description
 ## Session
 支持以会话的形式管理用户登陆。会话应该在玩家登陆之前请求服务器取得，
 在玩家登陆之后以PluginChannel形式交服务器校验。(Unstable API)
+
 ![](1.png)
 
 ## License

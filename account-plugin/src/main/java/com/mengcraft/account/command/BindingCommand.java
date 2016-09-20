@@ -7,6 +7,7 @@ import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.Member;
 import com.mengcraft.account.util.It;
 import com.mojang.authlib.Agent;
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 import org.bukkit.ChatColor;
@@ -71,71 +72,50 @@ public class BindingCommand implements CommandExecutor {
     }
 
     private boolean execute(Player p, String name, String pass) {
-        if (Account.INSTANCE.memberBinding(p)) {
+        boolean b = Account.INSTANCE.memberBinding(p);
+        if (b) {
             p.sendMessage(ChatColor.GOLD + "您已绑定正版账号，请勿重复绑定");
         } else {
-            return processPreQuery(p, name, pass);
+            processPreQuery(p, name, pass);
         }
-        return false;
+        return !b;
     }
 
-    private boolean processPreQuery(Player p, String name, String pass) {
+    private void processPreQuery(Player p, String mail, String pass) {
         if (locked.add(p.getName())) {
             main.execute(() -> {
-                EbeanServer db = main.getDatabase();
-                AppAccountBinding j1 = db.find(AppAccountBinding.class)
-                        .where()
-                        .eq("binding", name)
-                        .findUnique();
-                if (eq(j1, null)) {
-                    processQuery(p, name, pass);
-                } else {
-                    p.sendMessage(ChatColor.RED + "该账号已被玩家"
-                            + db.find(Member.class, j1.getUid()).getUsername()
-                            + "绑定"
-                    );
+                YggdrasilUserAuthentication remote = new YggdrasilUserAuthentication(new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString()), Agent.MINECRAFT);
+                remote.setUsername(mail);
+                remote.setPassword(pass);
+                try {
+                    remote.logIn();
+                    if (remote.canPlayOnline()) {
+                        execute(p, Account.INSTANCE.getMember(p), mail, remote.getSelectedProfile());
+                    } else {
+                        p.sendMessage(ChatColor.RED + "发生了一些问题，认证出错或正版验证服务器无法连接");
+                    }
+                } catch (Exception ignored) {
+                    p.sendMessage(ChatColor.RED + "该账号无法绑定");
                 }
                 main.process(() -> locked.remove(p.getName()));
             });
-            return true;
-        }
-        return false;
-    }
-
-    private void processQuery(Player p, String mail, String pass) {
-        YggdrasilUserAuthentication remote = new YggdrasilUserAuthentication(new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString()), Agent.MINECRAFT);
-        remote.setUsername(mail);
-        remote.setPassword(pass);
-        try {
-            remote.logIn();
-            if (remote.canPlayOnline()) {
-                execute(p, Account.INSTANCE.getMember(p), mail, remote.getSelectedProfile().getId());
-            } else {
-                p.sendMessage(ChatColor.RED + "发生了一些问题，认证出错或正版验证服务器无法连接");
-            }
-        } catch (Exception ignored) {
-            p.sendMessage(ChatColor.RED + "发生了一些问题，认证出错或正版验证服务器无法连接");
+        } else {
+            p.sendMessage(ChatColor.RED + "验证您的账号中，请稍候");
         }
     }
 
-    private void execute(Player p, Member member, String name, UUID id) {
+    private void execute(Player p, Member member, String mail, GameProfile profile) {
         EbeanServer db = main.getDatabase();
-        db.beginTransaction();
-        try {
-            AppAccountBinding binding = new AppAccountBinding();
-            binding.setBinding(name);
-            binding.setBindingId(id);
-            binding.setMember(member);
-            db.save(binding);
-            db.refresh(member);// Force refresh from db
-            db.commitTransaction();
-            p.sendMessage(ChatColor.GOLD + "正版账号绑定成功");
-            main.process(() -> {
-                callback(main.getServer().getConsoleSender(), main.getConfig().getString("binding.execute"), p.getName());
-            });
-        } finally {
-            db.endTransaction();
-        }
+        AppAccountBinding binding = new AppAccountBinding();
+        binding.setBinding(mail);
+        binding.setBindingId(profile.getId());
+        binding.setMember(member);
+        db.save(binding);
+        db.refresh(member);// Force refresh from db
+        p.sendMessage(ChatColor.GOLD + "正版账号绑定成功");
+        main.process(() -> {
+            callback(main.getServer().getConsoleSender(), main.getConfig().getString("binding.execute"), p.getName());
+        });
     }
 
     private void callback(CommandSender sender, String string, String name) {
