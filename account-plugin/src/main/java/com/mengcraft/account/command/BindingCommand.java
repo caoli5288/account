@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import java.net.Proxy;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -114,13 +115,14 @@ public class BindingCommand implements CommandExecutor {
         db.refresh(member);// Force refresh from db
         p.sendMessage(ChatColor.GOLD + "正版账号绑定成功");
         main.process(() -> {
-            callback(main.getServer().getConsoleSender(), main.getConfig().getString("binding.execute"), p.getName());
+            execute(main.getConfig().getStringList("binding.execute"), p.getName());
         });
     }
 
-    private void callback(CommandSender sender, String string, String name) {
-        for (String line : string.replace("$p", name).split(";")) {
-            main.getServer().dispatchCommand(sender, line);
+    private void execute(List<String> list, String name) {
+        CommandSender sender = main.getServer().getConsoleSender();
+        for (String line : list) {
+            main.getServer().dispatchCommand(sender, line.replace("%player%", name));
         }
     }
 

@@ -7,7 +7,7 @@ binding:
   command: true
   # 多行以分号';'隔开
   # 变量$p自动替换成玩家名
-  execute: ""
+  execute: []
 minimal: false
 log: true
 kick: 600

@@ -1,6 +1,6 @@
 package com.mengcraft.account;
 
-import com.mengcraft.account.bungee.BungeeMain;
+import com.mengcraft.account.bungee.BungeeMessage;
 import com.mengcraft.account.bungee.BungeeSupport;
 import com.mengcraft.account.command.BindingCommand;
 import com.mengcraft.account.entity.AppAccountBinding;
@@ -42,14 +42,14 @@ public class Main extends JavaPlugin {
 
         if (!getConfig().getBoolean("minimal")) {
             new Executor(this, new Messenger(this)).bind();
-            new ExecutorEvent().bind(this);
+            new EventListener().bind(this);
 
             if (getConfig().getBoolean("binding.command")) {
                 getCommand("binding").setExecutor(new BindingCommand(this));
             }
 
-            getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMain.CHANNEL, BungeeSupport.INSTANCE);
-            getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMain.CHANNEL);
+            getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMessage.CHANNEL, BungeeSupport.INSTANCE);
+            getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMessage.CHANNEL);
         }
 
         new MetricsLite(this).start();

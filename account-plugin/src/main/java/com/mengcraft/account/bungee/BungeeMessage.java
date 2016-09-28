@@ -14,6 +14,8 @@ import java.util.Collection;
  */
 public class BungeeMessage {
 
+    public static final String CHANNEL = "AccountBungee";
+
     private byte type;
     private String name;
     private String ip;
@@ -52,7 +54,7 @@ public class BungeeMessage {
         try {
             output.write(type);
             output.writeUTF(name);
-            if (type < BungeeMain.DEL_LOGGED && ip != null) {
+            if (type < BungeeMessage.DEL && ip != null) {
                 output.writeUTF(ip);
             }
         } catch (IOException ignore) {
@@ -63,7 +65,7 @@ public class BungeeMessage {
     public void broadcast(Collection<ServerInfo> targetList) {
         byte[] buf = toByteArray();
         for (ServerInfo info : targetList) {
-            info.sendData(BungeeMain.CHANNEL, buf, true);
+            info.sendData(BungeeMessage.CHANNEL, buf, true);
         }
     }
 
@@ -81,10 +83,14 @@ public class BungeeMessage {
         try {
             info.type = input.readByte();
             info.name = input.readUTF();
-            info.ip = input.readUTF();// Ignore this throw.
+            info.ip = input.readUTF();
         } catch (IOException ignore) {
         }
         return info;
     }
+
+    public static final byte DISTRIBUTE = 0;
+    public static final byte ADD = 1;
+    public static final byte DEL = 2;
 
 }

@@ -11,7 +11,6 @@ import java.io.DataInput;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.mengcraft.account.bungee.BungeeMain.CHANNEL;
 import static com.mengcraft.account.util.Util.eq;
 
 /**
@@ -28,7 +27,7 @@ public class BungeeSupport implements PluginMessageListener {
 
     @Override
     public void onPluginMessageReceived(String tag, Player p, byte[] data) {
-        if (eq(tag, BungeeMain.CHANNEL)) {
+        if (eq(tag, BungeeMessage.CHANNEL)) {
             processMessage(data);
         }
     }
@@ -36,7 +35,7 @@ public class BungeeSupport implements PluginMessageListener {
     private void processMessage(byte[] data) {
         DataInput input = ReadWriteUtil.toDataInput(data);
         BungeeMessage message = BungeeMessage.read(input);
-        if (eq(message.getType(), BungeeMain.ADD_LOGGED)) {
+        if (eq(message.getType(), BungeeMessage.ADD)) {
             Player p = Bukkit.getPlayerExact(message.getName());
             if (!eq(p, null) && LockedList.INSTANCE.isLocked(p.getUniqueId())) {
                 if (eq(message.getIp(), p.getAddress().getAddress().getHostAddress())) {
@@ -44,7 +43,7 @@ public class BungeeSupport implements PluginMessageListener {
                 }
             }
             map.put(message.getName(), message.getIp());
-        } else if (eq(message.getType(), BungeeMain.DEL_LOGGED)) {
+        } else if (eq(message.getType(), BungeeMessage.DEL)) {
             map.remove(message.getName());
         }
     }
@@ -56,11 +55,11 @@ public class BungeeSupport implements PluginMessageListener {
 
     public void sendLoggedIn(Plugin plugin, Player p) {
         BungeeMessage message = new BungeeMessage();
-        message.setType(BungeeMain.DISTRIBUTE);
+        message.setType(BungeeMessage.DISTRIBUTE);
         message.setName(p.getName());
         message.setIp(p.getAddress().getAddress().getHostAddress());
         plugin.getLogger().info("Send " + message.toString());
-        p.sendPluginMessage(plugin, CHANNEL, message.toByteArray());
+        p.sendPluginMessage(plugin, BungeeMessage.CHANNEL, message.toByteArray());
     }
 
 }

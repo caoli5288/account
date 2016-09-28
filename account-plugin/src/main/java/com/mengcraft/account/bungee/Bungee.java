@@ -16,22 +16,17 @@ import static com.mengcraft.account.util.Util.eq;
 /**
  * Created on 16-2-17.
  */
-public class BungeeMain extends Plugin implements Listener {
-
-    public static final String CHANNEL = "AccountBungee";
-    public static final byte DISTRIBUTE = 0;
-    public static final byte ADD_LOGGED = 1;
-    public static final byte DEL_LOGGED = 2;
+public class Bungee extends Plugin implements Listener {
 
     @Override
     public void onEnable() {
-        getProxy().registerChannel(CHANNEL);
+        getProxy().registerChannel(BungeeMessage.CHANNEL);
         getProxy().getPluginManager().registerListener(this, this);
     }
 
     @EventHandler
     public void handle(PluginMessageEvent event) {
-        if (eq(event.getTag(), CHANNEL)) {
+        if (eq(event.getTag(), BungeeMessage.CHANNEL)) {
             processMessage(event.getSender(), event.getData());
         }
     }
@@ -40,8 +35,8 @@ public class BungeeMain extends Plugin implements Listener {
         if (sender instanceof Server) {
             DataInput input = ReadWriteUtil.toDataInput(data);
             BungeeMessage message = BungeeMessage.read(input);
-            if (message.valid() && eq(message.getType(), DISTRIBUTE)) {
-                message.setType(ADD_LOGGED);
+            if (message.valid() && eq(message.getType(), BungeeMessage.DISTRIBUTE)) {
+                message.setType(BungeeMessage.ADD);
                 message.broadcast(getProxy().getServers().values());
             }
         }
@@ -50,7 +45,7 @@ public class BungeeMain extends Plugin implements Listener {
     @EventHandler
     public void handle(PlayerDisconnectEvent event) {
         BungeeMessage message = new BungeeMessage();
-        message.setType(DEL_LOGGED);
+        message.setType(BungeeMessage.DEL);
         message.setName(event.getPlayer().getName());
         message.broadcast(getProxy().getServers().values());
     }

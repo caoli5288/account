@@ -1,6 +1,6 @@
 package com.mengcraft.account.client;
 
-import com.mengcraft.account.bungee.BungeeMain;
+import com.mengcraft.account.bungee.BungeeMessage;
 import com.mengcraft.account.util.Messenger;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -21,7 +21,7 @@ public class Main extends JavaPlugin {
         handler.setMessenger(new Messenger(this));
 
         getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, handler);
-        getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMain.CHANNEL);
+        getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMessage.CHANNEL);
     }
 
     public void execute(Runnable runnable, boolean sync) {
