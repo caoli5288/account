@@ -98,7 +98,7 @@ public class BindingCommand implements CommandExecutor {
                 } catch (Exception ignored) {
                     p.sendMessage(ChatColor.RED + "该账号无法绑定");
                 }
-                main.process(() -> locked.remove(p.getName()));
+                main.run(() -> locked.remove(p.getName()));
             });
         } else {
             p.sendMessage(ChatColor.RED + "验证您的账号中，请稍候");
@@ -108,13 +108,14 @@ public class BindingCommand implements CommandExecutor {
     private void execute(Player p, Member member, String mail, GameProfile profile) {
         EbeanServer db = main.getDatabase();
         AppAccountBinding binding = new AppAccountBinding();
+        binding.setName(p.getName());
         binding.setBinding(mail);
         binding.setBindingId(profile.getId());
         binding.setMember(member);
         db.save(binding);
         db.refresh(member);// Force refresh from db
         p.sendMessage(ChatColor.GOLD + "正版账号绑定成功");
-        main.process(() -> {
+        main.run(() -> {
             execute(main.getConfig().getStringList("binding.execute"), p.getName());
         });
     }

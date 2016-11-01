@@ -22,6 +22,8 @@ public class AppAccountBinding {
     @Column(unique = true, nullable = false)
     private UUID bindingId;
 
+    private String name;
+
     @JoinColumn(name = "uid")
     @OneToOne
     private Member member;
@@ -48,6 +50,14 @@ public class AppAccountBinding {
 
     public void setBindingId(UUID bindingId) {
         this.bindingId = bindingId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Member getMember() {

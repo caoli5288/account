@@ -65,11 +65,11 @@ public class Main extends JavaPlugin {
         getServer().getScheduler().runTaskAsynchronously(this, runnable);
     }
 
-    public void process(Runnable task, int tick) {
+    public void run(Runnable task, int tick) {
         getServer().getScheduler().runTaskLater(this, task, tick);
     }
 
-    public void process(Runnable task) {
+    public void run(Runnable task) {
         getServer().getScheduler().runTask(this, task);
     }
 
@@ -81,4 +81,7 @@ public class Main extends JavaPlugin {
         return log;
     }
 
+    public static boolean nil(Object object) {
+        return object == null;
+    }
 }

@@ -2,6 +2,7 @@ package com.mengcraft.account;
 
 import com.avaje.ebean.EbeanServer;
 import com.mengcraft.account.bungee.BungeeSupport;
+import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.AppAccountEvent;
 import com.mengcraft.account.entity.Member;
 import com.mengcraft.account.event.UserLoggedInEvent;
@@ -81,7 +82,7 @@ public class Executor implements Listener {
                         cancel(); // Cancel if p exit or unlocked.
                 }
             }.runTaskTimer(main, 20, castInterval);
-            main.process(() -> {
+            main.run(() -> {
                 if (p.isOnline() && isLocked(p.getUniqueId())) {
                     event.getPlayer().kickPlayer(messenger.find("login.kick", ChatColor.DARK_RED + "未登录"));
                     if (main.isLog()) {
@@ -156,7 +157,7 @@ public class Executor implements Listener {
 
         BungeeSupport.INSTANCE.sendLoggedIn(main, p);
 
-        main.process(() -> { // Thread safe
+        main.run(() -> { // Thread safe
             LockedList.INSTANCE.remove(p.getUniqueId());
         });
 
@@ -170,19 +171,27 @@ public class Executor implements Listener {
     }
 
     private void processLogin(Player p, String password) {
-        Member j = Account.INSTANCE.getMember(p);// Need threading
-        if (j.valid() && j.valid(password)) {
+        Member member = Account.INSTANCE.getMember(p);// Need threading
+        if (member.valid() && member.valid(password)) {
             BungeeSupport.INSTANCE.sendLoggedIn(main, p);
-            main.process(() -> {// Thread safe
+
+            main.run(() -> {// Thread safe
                 LockedList.INSTANCE.remove(p.getUniqueId());
-                UserLoggedInEvent.post(p);
+                UserLoggedInEvent.call(p, member);
             });
             if (main.isLog()) {
                 db.save(of(p, LOG_SUCCESS));
             }
+
             messenger.send(p, "login.done", ChatColor.GREEN + "登录成功");
-            if (j.getEmail().isEmpty() && main.notifyMail()) {
+            if (member.getEmail().isEmpty() && main.notifyMail()) {
                 messenger.send(p, "notify.mail", ChatColor.RED + "为了您的账号安全请尽快前往论坛用户中心绑定密保邮箱");
+            }
+
+            AppAccountBinding binding = member.getBinding();
+            if (!Main.nil(binding) && !p.getName().equals(binding.getName())) {
+                binding.setName(p.getName());
+                main.getDatabase().save(binding);
             }
         } else {
             messenger.send(p, "login.password", ChatColor.DARK_RED + "密码错误");
