@@ -11,5 +11,9 @@ binding:
 minimal: false
 log: true
 kick: 600
+register:
+  disallow:
+  - ''
+  disable: false
 notify:
   mail: true

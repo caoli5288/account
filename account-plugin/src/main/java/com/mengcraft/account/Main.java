@@ -84,4 +84,5 @@ public class Main extends JavaPlugin {
     public static boolean nil(Object object) {
         return object == null;
     }
+
 }

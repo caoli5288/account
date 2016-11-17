@@ -20,8 +20,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import static com.mengcraft.account.entity.AppAccountEvent.LOG_FAILURE;
 import static com.mengcraft.account.entity.AppAccountEvent.LOG_SUCCESS;
@@ -34,10 +37,19 @@ public class Executor implements Listener {
     private final Messenger messenger;
     private final EbeanServer db;
 
+    private final List<Pattern> disallowed;
+    private final boolean regDisabled;
+
     public Executor(Main main, Messenger messenger) {
         this.messenger = messenger;
         this.main = main;
-        this.db = main.getDatabase();
+        db = main.getDatabase();
+        regDisabled = main.getConfig().getBoolean("register.disable");
+        HashSet<String> disallow = new HashSet<>(main.getConfig().getStringList("disallow"));
+        disallowed = new ArrayList<>(disallow.size());
+        for (String i : disallow) {
+            disallowed.add(Pattern.compile(i));
+        }
     }
 
     private String[] contents;
@@ -122,7 +134,11 @@ public class Executor implements Listener {
         main.execute(() -> {
             Member j = Account.INSTANCE.getMember(p);
             if (j.valid()) {
-                messenger.send(p, "register.failure", ChatColor.DARK_RED + "注册失败");
+                messenger.send(p, "register.failure", ChatColor.DARK_RED + "注册失败，本用户已经注册过");
+            } else if (regDisabled) {
+                messenger.send(p, "register.disable", ChatColor.DARK_RED + "注册失败，服务器已关闭注册");
+            } else if (disallowed(p.getName())) {
+                messenger.send(p, "register.disable", ChatColor.DARK_RED + "注册失败，本用户名不被允许");
             } else if (pass.length() < 6) {
                 messenger.send(p, "register.password.short", ChatColor.DARK_RED + "注册失败，请使用6位长度以上的密码");
             } else if (!eq(pass, next)) {
@@ -131,6 +147,15 @@ public class Executor implements Listener {
                 init(p, pass, j);
             }
         });
+    }
+
+    private boolean disallowed(String name) {
+        for (Pattern p : disallowed) {
+            if (p.matcher(name).matches()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void init(Player p, String pass, Member member) {
