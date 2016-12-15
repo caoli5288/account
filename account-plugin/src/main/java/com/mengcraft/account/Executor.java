@@ -45,7 +45,7 @@ public class Executor implements Listener {
         this.main = main;
         db = main.getDatabase();
         regDisabled = main.getConfig().getBoolean("register.disable");
-        HashSet<String> disallow = new HashSet<>(main.getConfig().getStringList("disallow"));
+        HashSet<String> disallow = new HashSet<>(main.getConfig().getStringList("register.disallow"));
         disallowed = new ArrayList<>(disallow.size());
         for (String i : disallow) {
             disallowed.add(Pattern.compile(i));
