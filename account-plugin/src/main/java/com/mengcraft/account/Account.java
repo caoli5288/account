@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.mengcraft.account.Main.nil;
 import static com.mengcraft.account.util.Util.eq;
 
 public class Account {
@@ -33,7 +34,7 @@ public class Account {
 
     public Member getMember(String name) {
         Member j = handle.get(name);
-        if (eq(j, null)) {
+        if (nil(j)) {
             j = fetch(name);
             handle.put(name, j);
         }

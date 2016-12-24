@@ -138,7 +138,7 @@ public class Executor implements Listener {
             } else if (regDisabled) {
                 messenger.send(p, "register.disable", ChatColor.DARK_RED + "注册失败，服务器已关闭注册");
             } else if (disallowed(p.getName())) {
-                messenger.send(p, "register.disable", ChatColor.DARK_RED + "注册失败，本用户名不被允许");
+                messenger.send(p, "register.disallow", ChatColor.DARK_RED + "注册失败，本用户名不被允许");
             } else if (pass.length() < 6) {
                 messenger.send(p, "register.password.short", ChatColor.DARK_RED + "注册失败，请使用6位长度以上的密码");
             } else if (!eq(pass, next)) {
