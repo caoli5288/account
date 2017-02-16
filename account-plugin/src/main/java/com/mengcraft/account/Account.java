@@ -1,13 +1,13 @@
 package com.mengcraft.account;
 
 import com.mengcraft.account.entity.Member;
+import com.mengcraft.account.util.$;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.mengcraft.account.Main.nil;
-import static com.mengcraft.account.util.Util.eq;
 
 public class Account {
 
@@ -46,7 +46,7 @@ public class Account {
                 .where()
                 .eq("username", name)
                 .findUnique();
-        if (eq(member, null)) {
+        if ($.nil(member)) {
             member = new Member();
         }
         return member;

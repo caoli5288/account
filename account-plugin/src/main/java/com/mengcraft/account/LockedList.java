@@ -1,7 +1,8 @@
 package com.mengcraft.account;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -11,18 +12,18 @@ public class LockedList {
 
     public static final LockedList INSTANCE = new LockedList();
 
-    private final List<UUID> locked = new ArrayList<>();
+    private final Set<UUID> locked = new HashSet<>();
 
-    public List<UUID> getLocked() {
+    public Collection<UUID> getLocked() {
         return locked;
     }
 
-    public void add(UUID uuid) {
-        locked.add(uuid);
+    public boolean add(UUID uuid) {
+        return locked.add(uuid);
     }
 
-    public void remove(UUID uuid) {
-        locked.remove(uuid);
+    public boolean remove(UUID uuid) {
+        return locked.remove(uuid);
     }
 
     public boolean isLocked(UUID uuid) {

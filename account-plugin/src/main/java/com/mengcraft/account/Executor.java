@@ -6,6 +6,7 @@ import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.AppAccountEvent;
 import com.mengcraft.account.entity.Member;
 import com.mengcraft.account.event.UserLoggedInEvent;
+import com.mengcraft.account.util.$;
 import com.mengcraft.account.util.It;
 import com.mengcraft.account.util.Messenger;
 import com.mengcraft.account.util.SecureUtil;
@@ -18,7 +19,6 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 import static com.mengcraft.account.entity.AppAccountEvent.LOG_FAILURE;
 import static com.mengcraft.account.entity.AppAccountEvent.LOG_SUCCESS;
 import static com.mengcraft.account.entity.AppAccountEvent.of;
-import static com.mengcraft.account.util.Util.eq;
 
 public class Executor implements Listener {
 
@@ -86,14 +85,12 @@ public class Executor implements Listener {
         if (BungeeSupport.INSTANCE.hasLoggedIn(p)) {
             LockedList.INSTANCE.remove(p.getUniqueId());
         } else {
-            new BukkitRunnable() {
-                public void run() {
-                    if (p.isOnline() && isLocked(p.getUniqueId()))
-                        p.sendMessage(contents);
-                    else
-                        cancel(); // Cancel if p exit or unlocked.
-                }
-            }.runTaskTimer(main, 20, castInterval);
+            $.run(main, 20, castInterval, t -> {
+                if (p.isOnline() && isLocked(p.getUniqueId()))
+                    p.sendMessage(contents);
+                else
+                    t.cancel(); // Cancel if p exit or unlocked.
+            });
             main.run(() -> {
                 if (p.isOnline() && isLocked(p.getUniqueId())) {
                     event.getPlayer().kickPlayer(messenger.find("login.kick", ChatColor.DARK_RED + "未登录"));
@@ -123,7 +120,7 @@ public class Executor implements Listener {
     }
 
     private void register(Player player, It<String> it) {
-        if (eq(it.length() - it.nextIndex(), 2)) {
+        if (it.length() - it.nextIndex() == 2) {
             register(player, it.next(), it.next());
         } else {
             messenger.send(player, "register.format", ChatColor.DARK_RED + "输入/register <密码> <重复密码>以完成注册");
@@ -141,7 +138,7 @@ public class Executor implements Listener {
                 messenger.send(p, "register.disallow", ChatColor.DARK_RED + "注册失败，本用户名不被允许");
             } else if (pass.length() < 6) {
                 messenger.send(p, "register.password.short", ChatColor.DARK_RED + "注册失败，请使用6位长度以上的密码");
-            } else if (!eq(pass, next)) {
+            } else if (!$.eq(pass, next)) {
                 messenger.send(p, "register.password.equal", ChatColor.DARK_RED + "注册失败，两次输入的密码内容不一致");
             } else {
                 init(p, pass, j);

@@ -5,6 +5,7 @@ import com.mengcraft.account.Account;
 import com.mengcraft.account.Main;
 import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.Member;
+import com.mengcraft.account.util.$;
 import com.mengcraft.account.util.It;
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.GameProfile;
@@ -21,8 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import static com.mengcraft.account.util.Util.eq;
 
 /**
  * Created on 16-7-8.
@@ -46,14 +45,14 @@ public class BindingCommand implements CommandExecutor {
 
     private boolean execute(Player p, It<String> it) {
         if (it.hasNext()) {
-            if (eq(it.length(), 2)) {
+            if (it.length() == 2) {
                 return execute(p, it.next(), it.next());
             } else {
                 p.sendMessage(ChatColor.GRAY + "输入\"/正版绑定 正版账号 正版密码\"进行绑定");
             }
         } else {
             Member member = Account.INSTANCE.getMember(p);
-            if (eq(member, null)) {
+            if ($.nil(member)) {
                 p.sendMessage(ChatColor.GRAY + "账号数据正在获取，请稍后再尝试");
             } else {
                 return fetchInfo(p, member);
@@ -64,7 +63,7 @@ public class BindingCommand implements CommandExecutor {
 
     private boolean fetchInfo(Player p, Member member) {
         AppAccountBinding binding = member.getBinding();
-        if (eq(binding, null)) {
+        if ($.nil(binding)) {
             p.sendMessage(ChatColor.GRAY + "您未绑定正版账号，输入\"/正版绑定 正版账号 正版密码\"进行绑定");
         } else {
             p.sendMessage(ChatColor.GOLD + "您已绑定正版账号：" + binding.getBinding());

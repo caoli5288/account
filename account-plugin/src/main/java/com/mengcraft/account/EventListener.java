@@ -71,9 +71,7 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void handle(PlayerQuitEvent event) {
-        if (locked.isLocked(event.getPlayer().getUniqueId())) {
-            locked.remove(event.getPlayer().getUniqueId());
-        }
+        locked.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
