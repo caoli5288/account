@@ -41,7 +41,11 @@ public class Main extends JavaPlugin {
         notifyMail = getConfig().getBoolean("notify.mail");
 
         if (!getConfig().getBoolean("minimal")) {
-            new Executor(this, new Messenger(this)).bind();
+            Executor exec = new Executor(this, new Messenger(this));
+            exec.bind();
+            exec.addExecLogin();
+            exec.addExecRegister();
+
             new EventListener().bind(this);
 
             if (getConfig().getBoolean("binding.command")) {

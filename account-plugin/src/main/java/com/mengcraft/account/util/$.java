@@ -1,7 +1,16 @@
 package com.mengcraft.account.util;
 
+import com.google.common.collect.ImmutableList;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Created on 17-1-18.
@@ -52,6 +61,48 @@ public class $ {
 
     public static boolean eq(Object left, Object o) {
         return (left == o) || (!nil(left) && left.equals(o));
+    }
+
+    public static class Exec extends Command {
+
+        private final IExec exec;
+
+        Exec(String name, IExec exec) {
+            super(name);
+            this.exec = exec;
+        }
+
+        @Override
+        public boolean execute(CommandSender sender, String l, String[] i) {
+            return testPermission(sender) && exec.exec(sender, l, ImmutableList.copyOf(i));
+        }
+    }
+
+    public interface IExec {
+
+        boolean exec(CommandSender sender, String command, List<String> list);
+    }
+
+    public static void addExecutor(Plugin plugin, Command command) {
+        try {
+            Field f = SimplePluginManager.class.getDeclaredField("commandMap");
+            f.setAccessible(true);
+            CommandMap map = (CommandMap) f.get(plugin.getServer().getPluginManager());
+            map.register(plugin.getName().toLowerCase(), command);
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void addExecutor(Plugin plugin, String command, IExec exec) {
+        addExecutor(plugin, command, null, exec);
+    }
+
+    public static void addExecutor(Plugin plugin, String command, String permission, IExec exec) {
+        Exec e = new Exec(command, exec);
+        e.setPermission(permission);
+        e.setPermissionMessage(ChatColor.RED + "您没有权限执行此类指令，请联系管理！");
+        addExecutor(plugin, e);
     }
 
 }

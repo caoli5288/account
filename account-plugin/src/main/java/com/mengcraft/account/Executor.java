@@ -7,16 +7,15 @@ import com.mengcraft.account.entity.AppAccountEvent;
 import com.mengcraft.account.entity.Member;
 import com.mengcraft.account.event.UserLoggedInEvent;
 import com.mengcraft.account.util.$;
-import com.mengcraft.account.util.It;
 import com.mengcraft.account.util.Messenger;
 import com.mengcraft.account.util.SecureUtil;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -54,18 +53,17 @@ public class Executor implements Listener {
     private String[] contents;
     private int castInterval;
 
-    @EventHandler
-    public void handle(PlayerCommandPreprocessEvent event) {
-        if (isLocked(event.getPlayer().getUniqueId())) {
-            It<String> it = new It<>(event.getMessage().split(" "));
-            String j = it.next();
-            if (j.equals("/l") || j.equals("/login")) {
-                processPreLogin(event.getPlayer(), it);
-            } else if (j.equals("/r") || j.equals("/reg") || j.equals("/register")) {
-                register(event.getPlayer(), it);
-            }
-            event.setCancelled(true);
-        }
+    public void addExecLogin() {
+        $.IExec exec = this::processPreLogin;
+        $.addExecutor(main, "l", exec);
+        $.addExecutor(main, "login", exec);
+    }
+
+    public void addExecRegister() {
+        $.IExec exec = this::preRegister;
+        $.addExecutor(main, "r", exec);
+        $.addExecutor(main, "reg", exec);
+        $.addExecutor(main, "register", exec);
     }
 
     @EventHandler
@@ -119,18 +117,22 @@ public class Executor implements Listener {
         setCastInterval(main.getConfig().getInt("broadcast.interval"));
     }
 
-    private void register(Player player, It<String> it) {
-        if (it.length() - it.nextIndex() == 2) {
-            register(player, it.next(), it.next());
+    private boolean preRegister(CommandSender sender, String unneeded, List<String> list) {
+        if (sender instanceof Player && list.size() == 2) {
+            Player p = (Player) sender;
+            if (!isLocked(p.getUniqueId())) return false;
+            register(p, list.get(0), list.get(1));
+            return true;
         } else {
-            messenger.send(player, "register.format", ChatColor.DARK_RED + "输入/register <密码> <重复密码>以完成注册");
+            messenger.send(sender, "register.format", ChatColor.DARK_RED + "输入/register <密码> <重复密码>以完成注册");
         }
+        return false;
     }
 
     private void register(Player p, String pass, String next) {
         main.execute(() -> {
-            Member j = Account.INSTANCE.getMember(p);
-            if (j.valid()) {
+            Member member = Account.INSTANCE.getMember(p);
+            if (member.valid()) {
                 messenger.send(p, "register.failure", ChatColor.DARK_RED + "注册失败，本用户已经注册过");
             } else if (regDisabled) {
                 messenger.send(p, "register.disable", ChatColor.DARK_RED + "注册失败，服务器已关闭注册");
@@ -141,7 +143,7 @@ public class Executor implements Listener {
             } else if (!$.eq(pass, next)) {
                 messenger.send(p, "register.password.equal", ChatColor.DARK_RED + "注册失败，两次输入的密码内容不一致");
             } else {
-                init(p, pass, j);
+                init(p, pass, member);
             }
         });
     }
@@ -168,7 +170,7 @@ public class Executor implements Listener {
         member.setSalt(salt);
         member.setUsername(p.getName());
         member.setRegip(p.getAddress().getAddress().getHostAddress());
-        member.setRegdate(unixTime());
+        member.setRegdate(now());
         member.setEmail("");
 
         db.save(member); //May throw exception.
@@ -186,14 +188,18 @@ public class Executor implements Listener {
         messenger.send(p, "register.succeed", ChatColor.GREEN + "注册成功");
     }
 
-    private void processPreLogin(Player p, It<String> it) {
-        if (it.hasNext()) {
-            main.execute(() -> processLogin(p, it.next()));
+    private boolean processPreLogin(CommandSender who, String unneeded, List<String> l) {
+        if (who instanceof Player) {
+            Player p = (Player) who;
+            if (l.isEmpty() || !isLocked(p.getUniqueId())) return false;
+            main.execute(() -> processLogin(p, l.get(0)));
+            return true;
         }
+        return false;
     }
 
-    private void processLogin(Player p, String password) {
-        Member member = Account.INSTANCE.getMember(p);// Need threading
+    private void processLogin(Player p, String password) {// Need threading
+        Member member = Account.INSTANCE.getMember(p);
         if (member.valid() && member.valid(password)) {
             BungeeSupport.INSTANCE.sendLoggedIn(main, p);
 
@@ -204,6 +210,8 @@ public class Executor implements Listener {
             if (main.isLog()) {
                 db.save(of(p, LOG_SUCCESS));
             }
+
+            // Post login
 
             messenger.send(p, "login.done", ChatColor.GREEN + "登录成功");
             if (member.getEmail().isEmpty() && main.notifyMail()) {
@@ -220,7 +228,7 @@ public class Executor implements Listener {
         }
     }
 
-    private int unixTime() {
+    private int now() {
         return (int) (System.currentTimeMillis() / 1000);
     }
 
