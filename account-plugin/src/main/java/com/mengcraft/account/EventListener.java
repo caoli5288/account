@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.mengcraft.account.util.CollectionUtil.convertTo;
 
@@ -28,6 +29,7 @@ import static com.mengcraft.account.util.CollectionUtil.convertTo;
  */
 public class EventListener implements Listener {
 
+    private final Pattern p = Pattern.compile("^/(l|login|r|reg|register)(\\s+.*|$)");
     private final LockedList locked = LockedList.INSTANCE;
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -41,8 +43,9 @@ public class EventListener implements Listener {
     public void handle(PlayerMoveEvent event) {
         if (locked.isLocked(event.getPlayer().getUniqueId())) {
             Location from = event.getFrom();
-            from.setPitch(event.getTo().getPitch());
-            from.setYaw(event.getTo().getYaw());
+            Location to = event.getTo();
+            from.setPitch(to.getPitch());
+            from.setYaw(to.getYaw());
 
             event.setTo(from);
         }
@@ -122,7 +125,8 @@ public class EventListener implements Listener {
     @EventHandler
     public void handle(PlayerCommandPreprocessEvent event) {
         if (locked.isLocked(event.getPlayer().getUniqueId())) {
-            event.setCancelled(true);
+            String message = event.getMessage();
+            if (!p.matcher(message).matches()) event.setCancelled(true);
         }
     }
 
